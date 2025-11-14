@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KILA - Validación de Facturas DIAN | Dashboard</title>
+  <link rel="stylesheet" href="components.css">
+  <style>
+    .stat-card {
+      background: var(--secondary-800);
+      border: 1px solid var(--secondary-700);
+      border-radius: 12px;
+      padding: 1.5rem;
+      transition: all var(--transition-fast);
+    }
+
+    .stat-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-lg);
+      border-color: var(--primary-600);
+    }
+
+    .stat-value {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin: 0.5rem 0;
+    }
+
+    .stat-label {
+      color: var(--secondary-400);
+      font-size: 0.875rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .stat-trend {
+      font-size: 0.875rem;
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+      margin-top: 0.5rem;
+    }
+
+    .chart-placeholder {
+      background: var(--secondary-700);
+      border-radius: 8px;
+      padding: 2rem;
+      text-align: center;
+      color: var(--secondary-400);
+      min-height: 250px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .invoice-row {
+      background: var(--secondary-800);
+      border: 1px solid var(--secondary-700);
+      border-radius: 8px;
+      padding: 1rem;
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      transition: all var(--transition-fast);
+      cursor: pointer;
+    }
+
+    .invoice-row:hover {
+      border-color: var(--primary-600);
+      background: var(--secondary-700);
+    }
+
+    .filter-chip {
+      padding: 0.5rem 1rem;
+      border-radius: 9999px;
+      border: 1px solid var(--secondary-600);
+      background: var(--secondary-800);
+      color: var(--secondary-300);
+      font-size: 0.875rem;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+
+    .filter-chip:hover,
+    .filter-chip.active {
+      border-color: var(--primary-600);
+      background: var(--primary-600);
+      color: white;
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <!-- Header -->
+    <header class="header">
+      <div class="logo">
+        <div class="logo-icon">K</div>
+        <span>KILA</span>
+      </div>
+
+      <nav class="header-nav">
+        <div class="breadcrumbs">
+          <span class="breadcrumb-item active">Dashboard</span>
+          <span>/</span>
+          <span class="breadcrumb-item">Validaciones</span>
+        </div>
+      </nav>
+
+      <div class="user-menu">
+        <div style="position: relative;">
+          <input
+            type="search"
+            placeholder="Buscar facturas..."
+            style="padding: 0.5rem 2.5rem 0.5rem 1rem; background: var(--secondary-700); border: 1px solid var(--secondary-600); border-radius: 8px; color: white; width: 250px;"
+          >
+          <span style="position: absolute; right: 0.75rem; top: 50%; transform: translateY(-50%); color: var(--secondary-400);">🔍</span>
+        </div>
+        <button class="btn btn-primary" onclick="window.location.href='01-cargar-factura.html'">
+          <span>+</span> Nueva Validación
+        </button>
+        <button class="btn btn-ghost">
+          <span>🌙</span>
+        </button>
+        <div class="user-avatar">AP</div>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Page Header -->
+      <div style="margin-bottom: 2rem;">
+        <h1 style="font-size: 2rem; font-weight: 700; color: white; margin-bottom: 0.5rem;">
+          Dashboard de Validaciones
+        </h1>
+        <p class="text-muted">
+          Monitoreo y gestión de facturas de importación - Normativa DIAN
+        </p>
+      </div>
+
+      <!-- Stats Grid -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;" class="fade-in">
+
+        <div class="stat-card">
+          <div class="stat-label">Total Validaciones</div>
+          <div class="stat-value" style="color: var(--primary-500);">127</div>
+          <div class="stat-trend text-success">
+            <span>↑</span>
+            <span>+12% vs mes anterior</span>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-label">Tasa de Aprobación</div>
+          <div class="stat-value" style="color: var(--success);">68%</div>
+          <div class="stat-trend text-success">
+            <span>↑</span>
+            <span>+5% mejora</span>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-label">Errores Críticos</div>
+          <div class="stat-value" style="color: var(--error);">41</div>
+          <div class="stat-trend text-error">
+            <span>↓</span>
+            <span>-8% vs mes anterior</span>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-label">Advertencias</div>
+          <div class="stat-value" style="color: var(--warning);">89</div>
+          <div class="stat-trend text-warning">
+            <span>→</span>
+            <span>Sin cambios</span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Charts Section -->
+      <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem; margin-bottom: 2rem;" class="fade-in">
+
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">📊 Validaciones por Día</h3>
+            <div style="display: flex; gap: 0.5rem;">
+              <button class="btn btn-ghost">7D</button>
+              <button class="btn btn-ghost">30D</button>
+              <button class="btn btn-ghost">90D</button>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="chart-placeholder">
+              <div style="font-size: 3rem;">📈</div>
+              <div>Gráfico de líneas - Validaciones en el tiempo</div>
+              <div style="font-size: 0.75rem; color: var(--secondary-500);">
+                Integración con Chart.js o similar
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">🎯 Por Estado</h3>
+          </div>
+          <div class="card-body">
+            <div class="chart-placeholder" style="min-height: 200px;">
+              <div style="font-size: 3rem;">🍩</div>
+              <div>Gráfico de dona</div>
+              <div style="margin-top: 1rem; width: 100%;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                  <span class="text-success">✓ Cumple</span>
+                  <span class="text-success">86</span>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                  <span class="text-error">✕ No Cumple</span>
+                  <span class="text-error">41</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Invoices Table -->
+      <div class="card fade-in">
+        <div class="card-header">
+          <h3 class="card-title">📋 Historial de Validaciones</h3>
+          <div style="display: flex; gap: 0.5rem;">
+            <button class="btn btn-outline">
+              <span>↓</span> Exportar CSV
+            </button>
+            <button class="btn btn-ghost">
+              <span>⚙️</span> Filtros
+            </button>
+          </div>
+        </div>
+
+        <!-- Filters -->
+        <div style="padding: 1.5rem; border-bottom: 1px solid var(--secondary-700); display: flex; gap: 0.75rem; flex-wrap: wrap;">
+          <div class="filter-chip active">Todas</div>
+          <div class="filter-chip">✓ Aprobadas</div>
+          <div class="filter-chip">✕ Rechazadas</div>
+          <div class="filter-chip">⚠ Con Advertencias</div>
+          <div class="filter-chip">Esta Semana</div>
+        </div>
+
+        <div class="card-body">
+
+          <!-- Invoice Row 1 -->
+          <div class="invoice-row" onclick="window.location.href='03-resultados.html'">
+            <div class="status-icon error">✕</div>
+            <div style="flex: 1;">
+              <div style="font-weight: 600; color: white;">factura_importacion_2024_001.json</div>
+              <div class="text-muted" style="font-size: 0.875rem;">
+                Tech Supplies China Ltd. → DWP Corporation
+              </div>
+            </div>
+            <div style="text-align: right; min-width: 150px;">
+              <div class="badge badge-error">8 Errores</div>
+              <div class="text-muted" style="font-size: 0.75rem; margin-top: 0.25rem;">
+                Hace 2 horas
+              </div>
+            </div>
+            <div style="min-width: 120px; text-align: right;">
+              <div style="font-weight: 700; color: white;">$62,000 USD</div>
+              <div class="text-muted" style="font-size: 0.75rem;">152 items</div>
+            </div>
+            <button class="btn btn-ghost">Ver →</button>
+          </div>
+
+          <!-- Invoice Row 2 -->
+          <div class="invoice-row">
+            <div class="status-icon success">✓</div>
+            <div style="flex: 1;">
+              <div style="font-weight: 600; color: white;">factura_exportador_china_003.json</div>
+              <div class="text-muted" style="font-size: 0.875rem;">
+                Electronics Corp → ImportCo S.A.S.
+              </div>
+            </div>
+            <div style="text-align: right; min-width: 150px;">
+              <div class="badge badge-success">Aprobada</div>
+              <div class="text-muted" style="font-size: 0.75rem; margin-top: 0.25rem;">
+                Ayer a las 14:32
+              </div>
+            </div>
+            <div style="min-width: 120px; text-align: right;">
+              <div style="font-weight: 700; color: white;">$145,000 USD</div>
+              <div class="text-muted" style="font-size: 0.75rem;">320 items</div>
+            </div>
+            <button class="btn btn-ghost">Ver →</button>
+          </div>
+
+          <!-- Invoice Row 3 -->
+          <div class="invoice-row">
+            <div class="status-icon warning">⚠</div>
+            <div style="flex: 1;">
+              <div style="font-weight: 600; color: white;">factura_usa_electronics_012.json</div>
+              <div class="text-muted" style="font-size: 0.875rem;">
+                USA Tech Inc. → Comercializadora Del Sur
+              </div>
+            </div>
+            <div style="text-align: right; min-width: 150px;">
+              <div class="badge badge-warning">2 Advertencias</div>
+              <div class="text-muted" style="font-size: 0.75rem; margin-top: 0.25rem;">
+                Hace 3 días
+              </div>
+            </div>
+            <div style="min-width: 120px; text-align: right;">
+              <div style="font-weight: 700; color: white;">$89,500 USD</div>
+              <div class="text-muted" style="font-size: 0.75rem;">215 items</div>
+            </div>
+            <button class="btn btn-ghost">Ver →</button>
+          </div>
+
+          <!-- Invoice Row 4 -->
+          <div class="invoice-row">
+            <div class="status-icon success">✓</div>
+            <div style="flex: 1;">
+              <div style="font-weight: 600; color: white;">factura_germany_machinery_008.json</div>
+              <div class="text-muted" style="font-size: 0.875rem;">
+                German Machinery GmbH → Industrial Solutions
+              </div>
+            </div>
+            <div style="text-align: right; min-width: 150px;">
+              <div class="badge badge-success">Aprobada</div>
+              <div class="text-muted" style="font-size: 0.75rem; margin-top: 0.25rem;">
+                Hace 5 días
+              </div>
+            </div>
+            <div style="min-width: 120px; text-align: right;">
+              <div style="font-weight: 700; color: white;">$320,000 EUR</div>
+              <div class="text-muted" style="font-size: 0.75rem;">85 items</div>
+            </div>
+            <button class="btn btn-ghost">Ver →</button>
+          </div>
+
+          <!-- Invoice Row 5 -->
+          <div class="invoice-row">
+            <div class="status-icon error">✕</div>
+            <div style="flex: 1;">
+              <div style="font-weight: 600; color: white;">factura_japan_auto_parts_015.json</div>
+              <div class="text-muted" style="font-size: 0.875rem;">
+                Tokyo Auto Parts Ltd. → Autopartes Colombia
+              </div>
+            </div>
+            <div style="text-align: right; min-width: 150px;">
+              <div class="badge badge-error">12 Errores</div>
+              <div class="text-muted" style="font-size: 0.75rem; margin-top: 0.25rem;">
+                Hace 1 semana
+              </div>
+            </div>
+            <div style="min-width: 120px; text-align: right;">
+              <div style="font-weight: 700; color: white;">$198,000 JPY</div>
+              <div class="text-muted" style="font-size: 0.75rem;">450 items</div>
+            </div>
+            <button class="btn btn-ghost">Ver →</button>
+          </div>
+
+          <!-- Invoice Row 6 -->
+          <div class="invoice-row">
+            <div class="status-icon success">✓</div>
+            <div style="flex: 1;">
+              <div style="font-weight: 600; color: white;">factura_brazil_textiles_022.json</div>
+              <div class="text-muted" style="font-size: 0.875rem;">
+                Textiles do Brasil → Moda Internacional
+              </div>
+            </div>
+            <div style="text-align: right; min-width: 150px;">
+              <div class="badge badge-success">Aprobada</div>
+              <div class="text-muted" style="font-size: 0.75rem; margin-top: 0.25rem;">
+                Hace 1 semana
+              </div>
+            </div>
+            <div style="min-width: 120px; text-align: right;">
+              <div style="font-weight: 700; color: white;">$54,000 USD</div>
+              <div class="text-muted" style="font-size: 0.75rem;">680 items</div>
+            </div>
+            <button class="btn btn-ghost">Ver →</button>
+          </div>
+
+          <!-- Pagination -->
+          <div style="margin-top: 1.5rem; display: flex; justify-content: space-between; align-items: center;">
+            <div class="text-muted" style="font-size: 0.875rem;">
+              Mostrando 1-6 de 127 validaciones
+            </div>
+            <div style="display: flex; gap: 0.5rem;">
+              <button class="btn btn-ghost">← Anterior</button>
+              <button class="btn btn-primary">1</button>
+              <button class="btn btn-ghost">2</button>
+              <button class="btn btn-ghost">3</button>
+              <button class="btn btn-ghost">...</button>
+              <button class="btn btn-ghost">22</button>
+              <button class="btn btn-ghost">Siguiente →</button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <script>
+    // Filter functionality
+    const filterChips = document.querySelectorAll('.filter-chip');
+    filterChips.forEach(chip => {
+      chip.addEventListener('click', () => {
+        filterChips.forEach(c => c.classList.remove('active'));
+        chip.classList.add('active');
+        // Add filter logic here
+      });
+    });
+  </script>
+</body>
+</html>

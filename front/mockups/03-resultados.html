@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KILA - Validación de Facturas DIAN | Resultados</title>
+  <link rel="stylesheet" href="components.css">
+  <style>
+    .json-viewer {
+      background: var(--secondary-900);
+      border-radius: 8px;
+      padding: 1.5rem;
+      font-family: 'Courier New', monospace;
+      font-size: 0.875rem;
+      line-height: 1.6;
+      overflow-x: auto;
+      max-height: calc(100vh - 200px);
+    }
+
+    .json-key {
+      color: var(--primary-400);
+    }
+
+    .json-string {
+      color: #a78bfa;
+    }
+
+    .json-number {
+      color: #60a5fa;
+    }
+
+    .json-boolean {
+      color: #f59e0b;
+    }
+
+    .json-null {
+      color: var(--secondary-500);
+    }
+
+    .highlight-error {
+      background: rgba(239, 68, 68, 0.2);
+      padding: 0.125rem 0.25rem;
+      border-radius: 4px;
+      border: 1px solid var(--error);
+    }
+
+    .summary-card {
+      background: linear-gradient(135deg, var(--secondary-800), var(--secondary-700));
+      border: 2px solid var(--secondary-600);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .summary-card.error {
+      border-color: var(--error);
+      background: linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(239, 68, 68, 0.05));
+    }
+
+    .summary-card.success {
+      border-color: var(--success);
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(16, 185, 129, 0.05));
+    }
+
+    .validation-item {
+      background: var(--secondary-700);
+      border: 1px solid var(--secondary-600);
+      border-radius: 8px;
+      padding: 1rem;
+      margin-bottom: 0.75rem;
+      transition: all var(--transition-fast);
+    }
+
+    .validation-item:hover {
+      border-color: var(--primary-600);
+      transform: translateX(4px);
+    }
+
+    .validation-item.error {
+      border-left: 4px solid var(--error);
+    }
+
+    .validation-item.warning {
+      border-left: 4px solid var(--warning);
+    }
+
+    .validation-item.success {
+      border-left: 4px solid var(--success);
+    }
+
+    .norm-reference {
+      display: inline-block;
+      padding: 0.25rem 0.5rem;
+      background: var(--secondary-600);
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-family: monospace;
+      color: var(--secondary-300);
+      margin-top: 0.5rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <!-- Header -->
+    <header class="header">
+      <div class="logo">
+        <div class="logo-icon">K</div>
+        <span>KILA</span>
+      </div>
+
+      <nav class="header-nav">
+        <div class="breadcrumbs">
+          <span class="breadcrumb-item">Validación DIAN</span>
+          <span>/</span>
+          <span class="breadcrumb-item active">Resultados</span>
+        </div>
+      </nav>
+
+      <div class="user-menu">
+        <div style="display: flex; gap: 0.5rem;">
+          <button class="btn btn-primary">
+            <span>📄</span> Exportar PDF
+          </button>
+          <button class="btn btn-outline">
+            <span>📥</span> Descargar JSON
+          </button>
+        </div>
+        <button class="btn btn-ghost">
+          <span>🌙</span>
+        </button>
+        <div class="user-avatar">AP</div>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Timeline Steps -->
+      <div class="timeline-steps">
+        <div class="step completed">
+          <div class="step-number">✓</div>
+          <div class="step-label">Cargar Factura</div>
+        </div>
+        <div class="step-connector" style="width: 100px; height: 2px; background: var(--success); margin: 0 -1rem;"></div>
+        <div class="step completed">
+          <div class="step-number">✓</div>
+          <div class="step-label">Validando</div>
+        </div>
+        <div class="step-connector" style="width: 100px; height: 2px; background: var(--success); margin: 0 -1rem;"></div>
+        <div class="step active">
+          <div class="step-number">3</div>
+          <div class="step-label">Resultados</div>
+        </div>
+      </div>
+
+      <!-- Floating Metrics Panel -->
+      <div class="metrics-panel fade-in">
+        <h3 style="font-size: 1rem; font-weight: 700; color: white; margin-bottom: 1rem;">
+          Resumen de Validación
+        </h3>
+        <div class="metric-item">
+          <span class="metric-label">Estado</span>
+          <span class="badge badge-error">No Cumple</span>
+        </div>
+        <div class="metric-item">
+          <span class="metric-label">Errores</span>
+          <span class="metric-value text-error">8</span>
+        </div>
+        <div class="metric-item">
+          <span class="metric-label">Advertencias</span>
+          <span class="metric-value text-warning">3</span>
+        </div>
+        <div class="metric-item">
+          <span class="metric-label">Validaciones</span>
+          <span class="metric-value text-success">24/35</span>
+        </div>
+        <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--secondary-700);">
+          <button class="btn btn-ghost" style="width: 100%; justify-content: center;" onclick="window.location.href='01-cargar-factura.html'">
+            <span>↻</span> Nueva Validación
+          </button>
+        </div>
+      </div>
+
+      <!-- Split View -->
+      <div class="split-view fade-in">
+        <!-- Left Panel - JSON Preview -->
+        <div class="split-panel">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+            <h2 style="font-size: 1.25rem; font-weight: 700; color: white;">
+              📄 Factura Original
+            </h2>
+            <div style="display: flex; gap: 0.5rem;">
+              <button class="btn btn-ghost" title="Copiar JSON">📋</button>
+              <button class="btn btn-ghost" title="Expandir">⛶</button>
+            </div>
+          </div>
+
+          <div class="json-viewer">
+<pre style="margin: 0; color: var(--secondary-200);">{
+  <span class="json-key">"factura"</span>: {
+    <span class="json-key">"numero"</span>: <span class="json-string">"INV-2024-001"</span>,
+    <span class="json-key">"fecha"</span>: <span class="json-string">"2024-01-15"</span>,
+    <span class="json-key">"moneda"</span>: <span class="json-string">"USD"</span>
+  },
+  <span class="json-key">"proveedor"</span>: {
+    <span class="json-key">"nombre"</span>: <span class="json-string">"Tech Supplies China Ltd."</span>,
+    <span class="json-key">"pais"</span>: <span class="json-string">"China"</span>,
+    <span class="json-key">"direccion"</span>: <span class="json-string">"123 Industrial Zone, Shenzhen"</span>,
+    <span class="json-key">"telefono"</span>: <span class="json-string">"+86 755 1234567"</span>
+  },
+  <span class="json-key">"importador"</span>: {
+    <span class="json-key">"razonSocial"</span>: <span class="highlight-error json-string">""</span>,
+    <span class="json-key">"nit"</span>: <span class="highlight-error json-string">"900123456"</span>,
+    <span class="json-key">"direccion"</span>: <span class="json-string">"Calle 100 #15-20, Bogotá"</span>,
+    <span class="json-key">"ciudad"</span>: <span class="json-string">"Bogotá"</span>,
+    <span class="json-key">"pais"</span>: <span class="json-string">"Colombia"</span>
+  },
+  <span class="json-key">"mercancia"</span>: [
+    {
+      <span class="json-key">"descripcion"</span>: <span class="json-string">"Laptop Dell XPS 15"</span>,
+      <span class="json-key">"cantidad"</span>: <span class="json-number">50</span>,
+      <span class="json-key">"precioUnitario"</span>: <span class="json-number">1200.00</span>,
+      <span class="json-key">"total"</span>: <span class="highlight-error json-number">60000.00</span>,
+      <span class="json-key">"pesoUnitario"</span>: <span class="json-number">2.1</span>
+    },
+    {
+      <span class="json-key">"descripcion"</span>: <span class="highlight-error json-string">""</span>,
+      <span class="json-key">"cantidad"</span>: <span class="json-number">100</span>,
+      <span class="json-key">"precioUnitario"</span>: <span class="json-number">25.00</span>,
+      <span class="json-key">"total"</span>: <span class="json-number">2500.00</span>
+    }
+  ],
+  <span class="json-key">"transporte"</span>: {
+    <span class="json-key">"incoterm"</span>: <span class="json-string">"FOB"</span>,
+    <span class="json-key">"puertoOrigen"</span>: <span class="json-string">"Shenzhen Port"</span>,
+    <span class="json-key">"puertoDestino"</span>: <span class="json-string">"Buenaventura"</span>
+  },
+  <span class="json-key">"totales"</span>: {
+    <span class="json-key">"subtotal"</span>: <span class="json-number">62500.00</span>,
+    <span class="json-key">"descuento"</span>: <span class="json-number">0.00</span>,
+    <span class="json-key">"total"</span>: <span class="highlight-error json-number">62000.00</span>
+  }
+}</pre>
+          </div>
+        </div>
+
+        <!-- Right Panel - Validation Results -->
+        <div class="split-panel">
+          <div style="margin-bottom: 1.5rem;">
+            <h2 style="font-size: 1.25rem; font-weight: 700; color: white; margin-bottom: 0.5rem;">
+              🔍 Resultados de Validación
+            </h2>
+            <p class="text-muted" style="font-size: 0.875rem;">
+              factura_importacion_2024_001.json
+            </p>
+          </div>
+
+          <!-- Summary Card -->
+          <div class="summary-card error">
+            <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+              <div style="font-size: 3rem;">❌</div>
+              <div>
+                <h3 style="font-size: 1.5rem; font-weight: 700; color: var(--error); margin-bottom: 0.25rem;">
+                  No Cumple
+                </h3>
+                <p class="text-muted" style="font-size: 0.875rem;">
+                  La factura presenta errores que deben corregirse
+                </p>
+              </div>
+            </div>
+            <div style="display: flex; gap: 2rem;">
+              <div>
+                <div class="text-error" style="font-size: 1.5rem; font-weight: 700;">8</div>
+                <div class="text-muted" style="font-size: 0.75rem;">Errores Críticos</div>
+              </div>
+              <div>
+                <div class="text-warning" style="font-size: 1.5rem; font-weight: 700;">3</div>
+                <div class="text-muted" style="font-size: 0.75rem;">Advertencias</div>
+              </div>
+              <div>
+                <div class="text-success" style="font-size: 1.5rem; font-weight: 700;">24</div>
+                <div class="text-muted" style="font-size: 0.75rem;">Validaciones OK</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Validation Sections -->
+          <div>
+            <h3 style="color: white; font-size: 1rem; margin-bottom: 1rem;">
+              ⚠️ Errores Encontrados (8)
+            </h3>
+
+            <div class="validation-item error">
+              <div style="display: flex; justify-content: between; align-items: start; gap: 1rem;">
+                <div class="status-icon error">✕</div>
+                <div style="flex: 1;">
+                  <div style="font-weight: 600; color: white; margin-bottom: 0.25rem;">
+                    Razón Social del Importador Vacía
+                  </div>
+                  <div class="text-muted" style="font-size: 0.875rem; line-height: 1.5;">
+                    El campo <code style="background: var(--secondary-600); padding: 0.125rem 0.375rem; border-radius: 4px;">importador.razonSocial</code> es obligatorio y no puede estar vacío según la normativa DIAN.
+                  </div>
+                  <div class="norm-reference">📋 CT-COA-0124 - Sección 2.3</div>
+                </div>
+                <button class="btn btn-ghost" onclick="openDetailModal()">Ver Detalle</button>
+              </div>
+            </div>
+
+            <div class="validation-item error">
+              <div style="display: flex; justify-content: between; align-items: start; gap: 1rem;">
+                <div class="status-icon error">✕</div>
+                <div style="flex: 1;">
+                  <div style="font-weight: 600; color: white; margin-bottom: 0.25rem;">
+                    NIT sin Dígito de Verificación
+                  </div>
+                  <div class="text-muted" style="font-size: 0.875rem; line-height: 1.5;">
+                    El NIT <code style="background: var(--secondary-600); padding: 0.125rem 0.375rem; border-radius: 4px;">900123456</code> debe incluir el dígito de verificación (formato: 900123456-X).
+                  </div>
+                  <div class="norm-reference">📋 CT-COA-0124 - Sección 2.3.2</div>
+                </div>
+                <button class="btn btn-ghost">Ver Detalle</button>
+              </div>
+            </div>
+
+            <div class="validation-item error">
+              <div style="display: flex; justify-content: between; align-items: start; gap: 1rem;">
+                <div class="status-icon error">✕</div>
+                <div style="flex: 1;">
+                  <div style="font-weight: 600; color: white; margin-bottom: 0.25rem;">
+                    Descripción de Mercancía Vacía
+                  </div>
+                  <div class="text-muted" style="font-size: 0.875rem; line-height: 1.5;">
+                    El ítem #2 de mercancía tiene descripción vacía. Todas las mercancías deben tener descripción detallada.
+                  </div>
+                  <div class="norm-reference">📋 CT-COA-0124 - Sección 3.1</div>
+                </div>
+                <button class="btn btn-ghost">Ver Detalle</button>
+              </div>
+            </div>
+
+            <div class="validation-item error">
+              <div style="display: flex; justify-content: between; align-items: start; gap: 1rem;">
+                <div class="status-icon error">✕</div>
+                <div style="flex: 1;">
+                  <div style="font-weight: 600; color: white; margin-bottom: 0.25rem;">
+                    Error en Cálculo de Total
+                  </div>
+                  <div class="text-muted" style="font-size: 0.875rem; line-height: 1.5;">
+                    El total general ($62,000) no coincide con la suma de subtotales ($62,500). Diferencia: $500.
+                  </div>
+                  <div class="norm-reference">📋 Validación Cruzada de Cálculos</div>
+                </div>
+                <button class="btn btn-ghost">Ver Detalle</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Warnings Section -->
+          <div style="margin-top: 2rem;">
+            <h3 style="color: white; font-size: 1rem; margin-bottom: 1rem;">
+              ⚡ Advertencias (3)
+            </h3>
+
+            <div class="validation-item warning">
+              <div style="display: flex; justify-content: between; align-items: start; gap: 1rem;">
+                <div class="status-icon warning">⚠</div>
+                <div style="flex: 1;">
+                  <div style="font-weight: 600; color: white; margin-bottom: 0.25rem;">
+                    Peso No Especificado
+                  </div>
+                  <div class="text-muted" style="font-size: 0.875rem;">
+                    El ítem #2 no tiene peso especificado. Recomendado para cálculos de flete.
+                  </div>
+                </div>
+                <button class="btn btn-ghost">Ver Detalle</button>
+              </div>
+            </div>
+
+            <div class="validation-item warning">
+              <div style="display: flex; justify-content: between; align-items: start; gap: 1rem;">
+                <div class="status-icon warning">⚠</div>
+                <div style="flex: 1;">
+                  <div style="font-weight: 600; color: white; margin-bottom: 0.25rem;">
+                    Falta País de Fabricación
+                  </div>
+                  <div class="text-muted" style="font-size: 0.875rem;">
+                    No se especifica el país de fabricación de la mercancía.
+                  </div>
+                </div>
+                <button class="btn btn-ghost">Ver Detalle</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Success Section (Collapsed) -->
+          <div style="margin-top: 2rem;">
+            <button class="btn btn-ghost" style="width: 100%; justify-content: space-between;" onclick="toggleSuccess()">
+              <span>✅ Validaciones Exitosas (24)</span>
+              <span id="toggleIcon">▼</span>
+            </button>
+            <div id="successSection" class="hidden" style="margin-top: 1rem;">
+              <div class="validation-item success" style="opacity: 0.7;">
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                  <div class="status-icon success">✓</div>
+                  <div style="font-weight: 600; color: white;">Datos del proveedor completos</div>
+                </div>
+              </div>
+              <div class="validation-item success" style="opacity: 0.7;">
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                  <div class="status-icon success">✓</div>
+                  <div style="font-weight: 600; color: white;">Formato de fecha válido</div>
+                </div>
+              </div>
+              <div class="validation-item success" style="opacity: 0.7;">
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                  <div class="status-icon success">✓</div>
+                  <div style="font-weight: 600; color: white;">Moneda válida (USD)</div>
+                </div>
+              </div>
+              <p class="text-muted" style="text-align: center; font-size: 0.875rem; margin-top: 1rem;">
+                + 21 validaciones más...
+              </p>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    function toggleSuccess() {
+      const section = document.getElementById('successSection');
+      const icon = document.getElementById('toggleIcon');
+      section.classList.toggle('hidden');
+      icon.textContent = section.classList.contains('hidden') ? '▼' : '▲';
+    }
+
+    function openDetailModal() {
+      window.location.href = '05-modal-detalle.html';
+    }
+  </script>
+</body>
+</html>

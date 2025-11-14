@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KILA - Validación de Facturas DIAN | Cargar Factura</title>
+  <link rel="stylesheet" href="components.css">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Header -->
+    <header class="header">
+      <div class="logo">
+        <div class="logo-icon">K</div>
+        <span>KILA</span>
+      </div>
+
+      <nav class="header-nav">
+        <div class="breadcrumbs">
+          <span class="breadcrumb-item active">Validación DIAN</span>
+          <span>/</span>
+          <span class="breadcrumb-item">Nueva Validación</span>
+        </div>
+      </nav>
+
+      <div class="user-menu">
+        <button class="btn btn-ghost">
+          <span>🌙</span>
+        </button>
+        <div class="user-avatar">AP</div>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Timeline Steps -->
+      <div class="timeline-steps">
+        <div class="step active">
+          <div class="step-number">1</div>
+          <div class="step-label">Cargar Factura</div>
+        </div>
+        <div class="step-connector" style="width: 100px; height: 2px; background: var(--secondary-700); margin: 0 -1rem;"></div>
+        <div class="step">
+          <div class="step-number">2</div>
+          <div class="step-label">Validando</div>
+        </div>
+        <div class="step-connector" style="width: 100px; height: 2px; background: var(--secondary-700); margin: 0 -1rem;"></div>
+        <div class="step">
+          <div class="step-number">3</div>
+          <div class="step-label">Resultados</div>
+        </div>
+      </div>
+
+      <!-- Content Area -->
+      <div style="max-width: 800px; margin: 0 auto;">
+        <div class="card fade-in">
+          <div class="card-header">
+            <div>
+              <h1 class="card-title">Validador de Facturas de Importación</h1>
+              <p class="text-muted" style="font-size: 0.875rem; margin-top: 0.5rem;">
+                Verificación automática según normativa DIAN (CT-COA-0124)
+              </p>
+            </div>
+          </div>
+
+          <div class="card-body">
+            <!-- Upload Zone -->
+            <div class="upload-zone" id="uploadZone">
+              <div class="upload-icon">📄</div>
+              <h3 style="color: white; margin-bottom: 0.5rem;">Arrastra tu archivo JSON aquí</h3>
+              <p class="text-muted" style="margin-bottom: 1.5rem;">
+                o haz clic para seleccionar un archivo
+              </p>
+              <input type="file" id="fileInput" accept=".json" style="display: none;">
+              <button class="btn btn-primary" onclick="document.getElementById('fileInput').click()">
+                Seleccionar Archivo
+              </button>
+              <p class="text-muted" style="font-size: 0.75rem; margin-top: 1rem;">
+                Formatos aceptados: JSON • Tamaño máximo: 10MB
+              </p>
+            </div>
+
+            <!-- Recent Files -->
+            <div style="margin-top: 2rem;">
+              <h3 style="color: white; font-size: 1rem; margin-bottom: 1rem;">📁 Validaciones Recientes</h3>
+              <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+
+                <div class="card" style="padding: 1rem; cursor: pointer;">
+                  <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div style="display: flex; align-items: center; gap: 1rem;">
+                      <div class="status-icon error">✕</div>
+                      <div>
+                        <div style="font-weight: 600; color: white;">factura_importacion_2024_001.json</div>
+                        <div class="text-muted" style="font-size: 0.75rem;">Hace 2 horas • 8 errores encontrados</div>
+                      </div>
+                    </div>
+                    <button class="btn btn-ghost">
+                      <span>↻</span>
+                    </button>
+                  </div>
+                </div>
+
+                <div class="card" style="padding: 1rem; cursor: pointer;">
+                  <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div style="display: flex; align-items: center; gap: 1rem;">
+                      <div class="status-icon success">✓</div>
+                      <div>
+                        <div style="font-weight: 600; color: white;">factura_exportador_china_003.json</div>
+                        <div class="text-muted" style="font-size: 0.75rem;">Ayer • Validación exitosa</div>
+                      </div>
+                    </div>
+                    <button class="btn btn-ghost">
+                      <span>↻</span>
+                    </button>
+                  </div>
+                </div>
+
+                <div class="card" style="padding: 1rem; cursor: pointer;">
+                  <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div style="display: flex; align-items: center; gap: 1rem;">
+                      <div class="status-icon warning">⚠</div>
+                      <div>
+                        <div style="font-weight: 600; color: white;">factura_usa_electronics_012.json</div>
+                        <div class="text-muted" style="font-size: 0.75rem;">Hace 3 días • 2 advertencias</div>
+                      </div>
+                    </div>
+                    <button class="btn btn-ghost">
+                      <span>↻</span>
+                    </button>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+            <!-- Info Box -->
+            <div style="margin-top: 2rem; padding: 1rem; background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.2); border-radius: 8px;">
+              <div style="display: flex; gap: 1rem;">
+                <div style="font-size: 1.5rem;">ℹ️</div>
+                <div>
+                  <div style="font-weight: 600; color: var(--info); margin-bottom: 0.5rem;">
+                    Requisitos de la factura
+                  </div>
+                  <ul style="color: var(--secondary-300); font-size: 0.875rem; line-height: 1.8; padding-left: 1.5rem;">
+                    <li>Datos del proveedor (nombre, dirección, país)</li>
+                    <li>Datos del importador (NIT, razón social)</li>
+                    <li>Detalle de mercancía (descripción, cantidad, valor)</li>
+                    <li>Información de transporte (incoterm, país de origen)</li>
+                    <li>Valores totales y moneda de transacción</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div style="margin-top: 2rem; display: flex; gap: 1rem; justify-content: center;">
+          <button class="btn btn-outline">
+            <span>📊</span>
+            Ver Dashboard
+          </button>
+          <button class="btn btn-ghost">
+            <span>📖</span>
+            Documentación DIAN
+          </button>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    // Drag and Drop functionality
+    const uploadZone = document.getElementById('uploadZone');
+    const fileInput = document.getElementById('fileInput');
+
+    uploadZone.addEventListener('click', () => {
+      if (event.target === uploadZone || event.target.closest('.upload-icon, h3, p:not(button)')) {
+        fileInput.click();
+      }
+    });
+
+    uploadZone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      uploadZone.classList.add('dragover');
+    });
+
+    uploadZone.addEventListener('dragleave', () => {
+      uploadZone.classList.remove('dragover');
+    });
+
+    uploadZone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      uploadZone.classList.remove('dragover');
+
+      const files = e.dataTransfer.files;
+      if (files.length > 0) {
+        handleFile(files[0]);
+      }
+    });
+
+    fileInput.addEventListener('change', (e) => {
+      if (e.target.files.length > 0) {
+        handleFile(e.target.files[0]);
+      }
+    });
+
+    function handleFile(file) {
+      if (file.type === 'application/json') {
+        console.log('Archivo cargado:', file.name);
+        // Simular navegación a la pantalla de procesamiento
+        setTimeout(() => {
+          window.location.href = '02-procesando.html';
+        }, 500);
+      } else {
+        alert('Por favor, selecciona un archivo JSON válido');
+      }
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KILA - Validación de Facturas DIAN | Procesando</title>
+  <link rel="stylesheet" href="components.css">
+  <style>
+    .processing-animation {
+      width: 120px;
+      height: 120px;
+      margin: 0 auto 2rem;
+      position: relative;
+    }
+
+    .spinner {
+      width: 100%;
+      height: 100%;
+      border: 4px solid var(--secondary-700);
+      border-top-color: var(--primary-500);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .spinner-icon {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 3rem;
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    .validation-step {
+      padding: 1rem;
+      margin: 0.5rem 0;
+      background: var(--secondary-700);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      opacity: 0.5;
+      transition: all var(--transition-base);
+    }
+
+    .validation-step.active {
+      opacity: 1;
+      background: rgba(0, 204, 153, 0.1);
+      border: 1px solid var(--primary-600);
+    }
+
+    .validation-step.completed {
+      opacity: 1;
+    }
+
+    .step-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--secondary-600);
+      color: var(--secondary-300);
+      font-size: 1rem;
+      transition: all var(--transition-base);
+    }
+
+    .validation-step.active .step-icon {
+      background: var(--primary-600);
+      color: white;
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    .validation-step.completed .step-icon {
+      background: var(--success);
+      color: white;
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <!-- Header -->
+    <header class="header">
+      <div class="logo">
+        <div class="logo-icon">K</div>
+        <span>KILA</span>
+      </div>
+
+      <nav class="header-nav">
+        <div class="breadcrumbs">
+          <span class="breadcrumb-item">Validación DIAN</span>
+          <span>/</span>
+          <span class="breadcrumb-item active">Procesando</span>
+        </div>
+      </nav>
+
+      <div class="user-menu">
+        <button class="btn btn-ghost">
+          <span>🌙</span>
+        </button>
+        <div class="user-avatar">AP</div>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Timeline Steps -->
+      <div class="timeline-steps">
+        <div class="step completed">
+          <div class="step-number">✓</div>
+          <div class="step-label">Cargar Factura</div>
+        </div>
+        <div class="step-connector" style="width: 100px; height: 2px; background: var(--success); margin: 0 -1rem;"></div>
+        <div class="step active">
+          <div class="step-number">2</div>
+          <div class="step-label">Validando</div>
+        </div>
+        <div class="step-connector" style="width: 100px; height: 2px; background: var(--secondary-700); margin: 0 -1rem;"></div>
+        <div class="step">
+          <div class="step-number">3</div>
+          <div class="step-label">Resultados</div>
+        </div>
+      </div>
+
+      <!-- Content Area -->
+      <div style="max-width: 700px; margin: 0 auto;">
+        <div class="card fade-in">
+          <div class="card-header" style="text-align: center; display: block;">
+            <h1 class="card-title">Validando Factura</h1>
+            <p class="text-muted" style="font-size: 0.875rem; margin-top: 0.5rem;">
+              factura_importacion_2024_001.json
+            </p>
+          </div>
+
+          <div class="card-body">
+            <!-- Processing Animation -->
+            <div class="processing-animation">
+              <div class="spinner"></div>
+              <div class="spinner-icon">🔍</div>
+            </div>
+
+            <!-- Progress Bar -->
+            <div style="margin-bottom: 2rem;">
+              <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                <span class="text-muted" style="font-size: 0.875rem;">Progreso</span>
+                <span class="text-primary" style="font-weight: 600; font-size: 0.875rem;" id="progressText">45%</span>
+              </div>
+              <div class="progress-bar">
+                <div class="progress-fill animated" id="progressBar" style="width: 45%;"></div>
+              </div>
+            </div>
+
+            <!-- Validation Steps -->
+            <div style="margin-top: 2rem;">
+              <h3 style="color: white; font-size: 1rem; margin-bottom: 1rem;">Validaciones en Proceso</h3>
+
+              <div class="validation-step completed">
+                <div class="step-icon">✓</div>
+                <div style="flex: 1;">
+                  <div style="font-weight: 600; color: white;">Estructura del archivo JSON</div>
+                  <div class="text-muted" style="font-size: 0.75rem;">Completado</div>
+                </div>
+              </div>
+
+              <div class="validation-step completed">
+                <div class="step-icon">✓</div>
+                <div style="flex: 1;">
+                  <div style="font-weight: 600; color: white;">Datos del proveedor</div>
+                  <div class="text-muted" style="font-size: 0.75rem;">Completado</div>
+                </div>
+              </div>
+
+              <div class="validation-step active">
+                <div class="step-icon">⏳</div>
+                <div style="flex: 1;">
+                  <div style="font-weight: 600; color: white;">Datos del importador</div>
+                  <div class="text-primary" style="font-size: 0.75rem;">Validando NIT y razón social...</div>
+                </div>
+              </div>
+
+              <div class="validation-step">
+                <div class="step-icon">•</div>
+                <div style="flex: 1;">
+                  <div style="font-weight: 600; color: var(--secondary-400);">Detalle de mercancía</div>
+                  <div class="text-muted" style="font-size: 0.75rem;">Pendiente</div>
+                </div>
+              </div>
+
+              <div class="validation-step">
+                <div class="step-icon">•</div>
+                <div style="flex: 1;">
+                  <div style="font-weight: 600; color: var(--secondary-400);">Información de transporte</div>
+                  <div class="text-muted" style="font-size: 0.75rem;">Pendiente</div>
+                </div>
+              </div>
+
+              <div class="validation-step">
+                <div class="step-icon">•</div>
+                <div style="flex: 1;">
+                  <div style="font-weight: 600; color: var(--secondary-400);">Validación cruzada de cálculos</div>
+                  <div class="text-muted" style="font-size: 0.75rem;">Pendiente</div>
+                </div>
+              </div>
+
+              <div class="validation-step">
+                <div class="step-icon">•</div>
+                <div style="flex: 1;">
+                  <div style="font-weight: 600; color: var(--secondary-400);">Conformidad DIAN (CT-COA-0124)</div>
+                  <div class="text-muted" style="font-size: 0.75rem;">Pendiente</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Info -->
+            <div style="margin-top: 2rem; padding: 1rem; background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.2); border-radius: 8px; text-align: center;">
+              <p class="text-muted" style="font-size: 0.875rem;">
+                ⚡ Este proceso puede tomar entre 10 a 30 segundos
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Cancel Button -->
+        <div style="margin-top: 1.5rem; text-align: center;">
+          <button class="btn btn-ghost" onclick="window.location.href='01-cargar-factura.html'">
+            Cancelar Validación
+          </button>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    // Simulate validation process
+    const steps = [
+      { selector: 0, name: 'Estructura del archivo JSON', duration: 1000 },
+      { selector: 1, name: 'Datos del proveedor', duration: 1500 },
+      { selector: 2, name: 'Datos del importador', duration: 2000 },
+      { selector: 3, name: 'Detalle de mercancía', duration: 1800 },
+      { selector: 4, name: 'Información de transporte', duration: 1200 },
+      { selector: 5, name: 'Validación cruzada de cálculos', duration: 1500 },
+      { selector: 6, name: 'Conformidad DIAN', duration: 1000 }
+    ];
+
+    const progressBar = document.getElementById('progressBar');
+    const progressText = document.getElementById('progressText');
+    const validationSteps = document.querySelectorAll('.validation-step');
+
+    let currentStep = 2;
+    let progress = 45;
+
+    function updateProgress() {
+      if (currentStep < steps.length) {
+        // Mark previous as completed
+        if (currentStep > 2) {
+          validationSteps[currentStep - 1].classList.remove('active');
+          validationSteps[currentStep - 1].classList.add('completed');
+          validationSteps[currentStep - 1].querySelector('.step-icon').textContent = '✓';
+          validationSteps[currentStep - 1].querySelector('.text-primary, .text-muted').textContent = 'Completado';
+          validationSteps[currentStep - 1].querySelector('.text-primary, .text-muted').className = 'text-muted';
+        }
+
+        // Mark current as active
+        validationSteps[currentStep].classList.add('active');
+        validationSteps[currentStep].querySelector('.step-icon').textContent = '⏳';
+        const statusText = validationSteps[currentStep].querySelector('.text-muted');
+        statusText.textContent = 'Validando...';
+        statusText.className = 'text-primary';
+
+        // Update progress
+        progress = Math.min(100, progress + 15);
+        progressBar.style.width = progress + '%';
+        progressText.textContent = progress + '%';
+
+        currentStep++;
+        setTimeout(updateProgress, steps[currentStep - 1].duration);
+      } else {
+        // All steps completed
+        validationSteps[validationSteps.length - 1].classList.remove('active');
+        validationSteps[validationSteps.length - 1].classList.add('completed');
+        validationSteps[validationSteps.length - 1].querySelector('.step-icon').textContent = '✓';
+
+        progressBar.style.width = '100%';
+        progressText.textContent = '100%';
+
+        // Redirect to results
+        setTimeout(() => {
+          window.location.href = '03-resultados.html';
+        }, 1000);
+      }
+    }
+
+    // Start simulation after 2 seconds
+    setTimeout(updateProgress, 2000);
+  </script>
+</body>
+</html>

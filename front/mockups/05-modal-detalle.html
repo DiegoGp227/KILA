@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KILA - Detalle de Error</title>
+  <link rel="stylesheet" href="components.css">
+  <style>
+    .code-block {
+      background: var(--secondary-900);
+      border: 1px solid var(--secondary-700);
+      border-radius: 8px;
+      padding: 1rem;
+      font-family: 'Courier New', monospace;
+      font-size: 0.875rem;
+      overflow-x: auto;
+    }
+
+    .diff-line {
+      padding: 0.25rem 0.5rem;
+      margin: 0.125rem 0;
+    }
+
+    .diff-removed {
+      background: rgba(239, 68, 68, 0.2);
+      color: var(--error);
+    }
+
+    .diff-added {
+      background: rgba(16, 185, 129, 0.2);
+      color: var(--success);
+    }
+
+    .solution-step {
+      background: var(--secondary-700);
+      border-left: 3px solid var(--primary-600);
+      padding: 1rem;
+      margin: 0.75rem 0;
+      border-radius: 4px;
+    }
+
+    .related-doc {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.75rem;
+      background: var(--secondary-700);
+      border-radius: 8px;
+      margin: 0.5rem 0;
+      text-decoration: none;
+      color: inherit;
+      transition: all var(--transition-fast);
+    }
+
+    .related-doc:hover {
+      background: var(--secondary-600);
+      border-left: 3px solid var(--primary-600);
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <!-- Header -->
+    <header class="header">
+      <div class="logo">
+        <div class="logo-icon">K</div>
+        <span>KILA</span>
+      </div>
+
+      <nav class="header-nav">
+        <div class="breadcrumbs">
+          <span class="breadcrumb-item">Validación DIAN</span>
+          <span>/</span>
+          <span class="breadcrumb-item">Resultados</span>
+          <span>/</span>
+          <span class="breadcrumb-item active">Detalle de Error</span>
+        </div>
+      </nav>
+
+      <div class="user-menu">
+        <button class="btn btn-ghost">
+          <span>🌙</span>
+        </button>
+        <div class="user-avatar">AP</div>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Modal Overlay -->
+      <div class="modal-overlay" onclick="closeModal(event)">
+        <div class="modal" onclick="event.stopPropagation()">
+          <!-- Modal Header -->
+          <div class="modal-header">
+            <div>
+              <h2 class="modal-title">Detalle del Error</h2>
+              <p class="text-muted" style="font-size: 0.875rem; margin-top: 0.25rem;">
+                Razón Social del Importador Vacía
+              </p>
+            </div>
+            <button class="btn btn-ghost" onclick="closeModal()">✕</button>
+          </div>
+
+          <!-- Modal Body -->
+          <div class="modal-body">
+
+            <!-- Error Summary -->
+            <div style="background: rgba(239, 68, 68, 0.1); border: 1px solid var(--error); border-radius: 8px; padding: 1.5rem; margin-bottom: 1.5rem;">
+              <div style="display: flex; gap: 1rem;">
+                <div class="status-icon error" style="width: 48px; height: 48px; font-size: 1.5rem;">✕</div>
+                <div style="flex: 1;">
+                  <h3 style="font-size: 1.25rem; font-weight: 700; color: var(--error); margin-bottom: 0.5rem;">
+                    Campo Obligatorio Vacío
+                  </h3>
+                  <p class="text-muted" style="line-height: 1.6;">
+                    El campo <code style="background: var(--secondary-700); padding: 0.125rem 0.5rem; border-radius: 4px; color: var(--error);">importador.razonSocial</code> es obligatorio según la normativa DIAN y no puede estar vacío.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Location in File -->
+            <div style="margin-bottom: 1.5rem;">
+              <h3 style="font-size: 1rem; font-weight: 700; color: white; margin-bottom: 1rem;">
+                📍 Ubicación en el Archivo
+              </h3>
+              <div class="code-block">
+<pre style="margin: 0; color: var(--secondary-300);">{
+  "factura": { ... },
+  "proveedor": { ... },
+  <span style="background: rgba(239, 68, 68, 0.2); padding: 0.125rem 0.25rem;">  "importador": {
+    "razonSocial": <span style="color: var(--error); font-weight: bold;">""</span>,  ← Error aquí
+    "nit": "900123456",
+    "direccion": "Calle 100 #15-20, Bogotá",
+    "ciudad": "Bogotá",
+    "pais": "Colombia"
+  }</span>,
+  "mercancia": [ ... ]
+}</pre>
+              </div>
+            </div>
+
+            <!-- Regulatory Reference -->
+            <div style="margin-bottom: 1.5rem;">
+              <h3 style="font-size: 1rem; font-weight: 700; color: white; margin-bottom: 1rem;">
+                📋 Referencia Normativa
+              </h3>
+              <div style="background: var(--secondary-700); border-radius: 8px; padding: 1.25rem;">
+                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.75rem;">
+                  <div>
+                    <div style="font-weight: 600; color: var(--primary-500); margin-bottom: 0.25rem;">
+                      Cartilla CT-COA-0124 - Sección 2.3
+                    </div>
+                    <div class="text-muted" style="font-size: 0.875rem;">
+                      Datos del Importador
+                    </div>
+                  </div>
+                  <button class="btn btn-ghost">🔗 Ver Documento</button>
+                </div>
+                <div style="padding: 1rem; background: var(--secondary-800); border-left: 3px solid var(--primary-600); border-radius: 4px;">
+                  <p class="text-muted" style="font-size: 0.875rem; line-height: 1.6; font-style: italic;">
+                    "La factura comercial debe incluir la información completa del importador, incluyendo <strong style="color: white;">razón social o nombre completo</strong>, NIT o número de identificación tributaria, dirección completa y país de residencia. Estos datos son obligatorios para el proceso de importación y la declaración aduanera."
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Solution Steps -->
+            <div style="margin-bottom: 1.5rem;">
+              <h3 style="font-size: 1rem; font-weight: 700; color: white; margin-bottom: 1rem;">
+                ✅ Cómo Corregirlo
+              </h3>
+
+              <div class="solution-step">
+                <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
+                  <div style="width: 24px; height: 24px; background: var(--primary-600); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.875rem; color: white;">1</div>
+                  <div style="font-weight: 600; color: white;">Agregar la Razón Social</div>
+                </div>
+                <p class="text-muted" style="font-size: 0.875rem; margin-left: 2rem;">
+                  Complete el campo con la razón social completa de la empresa importadora tal como aparece en el RUT.
+                </p>
+              </div>
+
+              <div class="solution-step">
+                <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
+                  <div style="width: 24px; height: 24px; background: var(--primary-600); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.875rem; color: white;">2</div>
+                  <div style="font-weight: 600; color: white;">Verificar Coincidencia con RUT</div>
+                </div>
+                <p class="text-muted" style="font-size: 0.875rem; margin-left: 2rem;">
+                  Asegúrese de que la razón social coincida exactamente con la registrada en el RUT de la empresa.
+                </p>
+              </div>
+
+              <div class="solution-step">
+                <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
+                  <div style="width: 24px; height: 24px; background: var(--primary-600); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.875rem; color: white;">3</div>
+                  <div style="font-weight: 600; color: white;">Validar Nuevamente</div>
+                </div>
+                <p class="text-muted" style="font-size: 0.875rem; margin-left: 2rem;">
+                  Una vez corregido, cargue nuevamente el archivo para validar que el error se haya solucionado.
+                </p>
+              </div>
+            </div>
+
+            <!-- Code Suggestion -->
+            <div style="margin-bottom: 1.5rem;">
+              <h3 style="font-size: 1rem; font-weight: 700; color: white; margin-bottom: 1rem;">
+                💡 Ejemplo de Corrección
+              </h3>
+              <div class="code-block">
+<pre style="margin: 0; color: var(--secondary-300);">"importador": {
+  <span class="diff-line diff-removed">- "razonSocial": "",</span>
+  <span class="diff-line diff-added">+ "razonSocial": "DWP CORPORATION S.A.S.",</span>
+  "nit": "900123456-1",
+  "direccion": "Calle 100 #15-20, Bogotá",
+  "ciudad": "Bogotá",
+  "pais": "Colombia"
+}</pre>
+              </div>
+            </div>
+
+            <!-- Related Errors -->
+            <div style="margin-bottom: 1.5rem;">
+              <h3 style="font-size: 1rem; font-weight: 700; color: white; margin-bottom: 1rem;">
+                🔗 Errores Relacionados
+              </h3>
+              <div style="background: var(--secondary-700); border-radius: 8px; padding: 1rem;">
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem;">
+                  <div style="display: flex; align-items: center; gap: 0.75rem;">
+                    <div class="status-icon error" style="width: 24px; height: 24px; font-size: 0.75rem;">✕</div>
+                    <span style="color: white; font-size: 0.875rem;">NIT sin Dígito de Verificación</span>
+                  </div>
+                  <button class="btn btn-ghost">Ver →</button>
+                </div>
+                <p class="text-muted" style="font-size: 0.75rem; margin-left: 2.5rem;">
+                  También en la sección del importador
+                </p>
+              </div>
+            </div>
+
+            <!-- Documentation Links -->
+            <div>
+              <h3 style="font-size: 1rem; font-weight: 700; color: white; margin-bottom: 1rem;">
+                📚 Documentación Adicional
+              </h3>
+
+              <a href="#" class="related-doc">
+                <div style="font-size: 1.5rem;">📄</div>
+                <div style="flex: 1;">
+                  <div style="font-weight: 600; color: white; font-size: 0.875rem;">
+                    Guía completa DIAN - Factura comercial
+                  </div>
+                  <div class="text-muted" style="font-size: 0.75rem;">
+                    dian.gov.co/documentos
+                  </div>
+                </div>
+                <span style="color: var(--primary-500);">→</span>
+              </a>
+
+              <a href="#" class="related-doc">
+                <div style="font-size: 1.5rem;">📖</div>
+                <div style="flex: 1;">
+                  <div style="font-weight: 600; color: white; font-size: 0.875rem;">
+                    Cartilla CT-COA-0124 (PDF)
+                  </div>
+                  <div class="text-muted" style="font-size: 0.75rem;">
+                    Normativa completa
+                  </div>
+                </div>
+                <span style="color: var(--primary-500);">→</span>
+              </a>
+
+              <a href="#" class="related-doc">
+                <div style="font-size: 1.5rem;">💬</div>
+                <div style="flex: 1;">
+                  <div style="font-weight: 600; color: white; font-size: 0.875rem;">
+                    Centro de ayuda KILA
+                  </div>
+                  <div class="text-muted" style="font-size: 0.75rem;">
+                    Preguntas frecuentes
+                  </div>
+                </div>
+                <span style="color: var(--primary-500);">→</span>
+              </a>
+            </div>
+
+          </div>
+
+          <!-- Modal Footer -->
+          <div class="modal-footer">
+            <button class="btn btn-ghost" onclick="closeModal()">Cerrar</button>
+            <button class="btn btn-primary" onclick="alert('Función de exportación de reporte del error')">
+              <span>📄</span> Exportar Detalle
+            </button>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    function closeModal(event) {
+      if (event && event.target !== event.currentTarget) return;
+      window.history.back();
+    }
+
+    // Close modal on ESC key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        closeModal();
+      }
+    });
+  </script>
+</body>
+</html>
