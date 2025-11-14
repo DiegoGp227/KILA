@@ -1,0 +1,154 @@
+@import "tailwindcss";
+
+@theme {
+  --color-white: #ffffff;
+  --color-green: #00f431;
+  --color-soft-gray: #555;
+  --color-hard-gray: #282828;
+  --color-blue: #212224;
+}
+
+:root {
+  --color-white: #ffffff;
+  --green: #00f431;
+  --soft-gray: #555;
+  --hard-gray: #282828;
+  --blue: #212224;
+}
+
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+/* Color palette utility classes - Background */
+.bg-color-white {
+  background-color: var(--color-white);
+}
+.bg-blue {
+  background-color: var(--blue);
+}
+.bg-green {
+  background-color: var(--green);
+}
+.bg-soft-gray {
+  background-color: var(--soft-gray);
+}
+.bg-hard-gray {
+  background-color: var(--hard-gray);
+}
+
+/* Color palette utility classes - Text */
+.text-color-white {
+  color: var(--color-white);
+}
+.text-blue {
+  color: var(--blue);
+}
+.text-green {
+  color: var(--green);
+}
+.text-soft-gray {
+  color: var(--soft-gray);
+}
+.text-hard-gray {
+  color: var(--hard-gray);
+}
+
+/* Color palette utility classes - Border */
+.border-color-white {
+  border-color: var(--color-white);
+}
+.border-blue {
+  border-color: var(--blue);
+}
+.border-green {
+  border-color: var(--green);
+}
+.border-soft-gray {
+  border-color: var(--soft-gray);
+}
+.border-hard-gray {
+  border-color: var(--hard-gray);
+}
+
+/* Hover variants */
+.hover\:border-green:hover {
+  border-color: var(--green) !important;
+}
+
+.hover\:border-blue:hover {
+  border-color: var(--blue) !important;
+}
+
+.input {
+  width: 350px;
+  height: 44px;
+  background-color: var(--hard-gray);
+  border-radius: 5px;
+  border: 2px solid var(--soft-gray);
+  color: var(--color-white);
+  font-size: 22px;
+  margin: 10px 10px;
+  outline: none;
+  padding: 0 0 0 15px;
+}
+
+.buttonRed {
+  width: 150px;
+  height: 44px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+  gap: 10px;
+  background-color: var(--hard-gray);
+  border-radius: 5px;
+  border: 2px solid #ff0000;
+  cursor: pointer;
+  color: white;
+  font-size: 22px;
+  transition: 0.7s;
+}
+
+.buttonRed:hover {
+  background-color: #ff0000;
+  color: black;
+}
+
+.input:focus {
+  border: none;
+  border: 2px solid var(--green);
+}
+
+.button {
+  width: 150px;
+  height: 44px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+  gap: 10px;
+  background-color: var(--hard-gray);
+  border-radius: 5px;
+  border: 2px solid var(--green);
+  cursor: pointer;
+  color: white;
+  font-size: 22px;
+  transition: 0.7s;
+}
+
+.button:hover {
+  background-color: var(--green);
+  color: black;
+}
+
+.button svg {
+  color: white;
+  transition: color 0.7s;
+}
+
+.button:hover svg {
+  color: black;
+}
