@@ -9,7 +9,7 @@ services:
       MYSQL_USER: ${MYSQL_USER}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     ports:
-      - "3307:3307" 
+      - "3307:3306" 
     volumes:
       - mysql_data:/var/lib/mysql
     networks:
@@ -37,7 +37,7 @@ services:
       TOKEN_EXPIRATION: ${TOKEN_EXPIRATION}
       API_KEY: ${API_KEY}
     ports:
-      - "4000:${PORT}"
+      - "4003:${PORT}"
     networks:
       - kila_network
 
@@ -50,7 +50,7 @@ services:
     environment:
       NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}
     ports:
-      - "5000:3000"
+      - "5003:3000"
     networks:
       - kila_network
 
