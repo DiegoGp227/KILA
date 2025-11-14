@@ -1,154 +1,57 @@
 @import "tailwindcss";
 
 @theme {
+  /* Colores base de Kila */
   --color-white: #ffffff;
   --color-green: #00f431;
-  --color-soft-gray: #555;
+  --color-soft-gray: #555555;
   --color-hard-gray: #282828;
   --color-blue: #212224;
-}
 
-:root {
-  --color-white: #ffffff;
-  --green: #00f431;
-  --soft-gray: #555;
-  --hard-gray: #282828;
-  --blue: #212224;
+  /* Escalas de color primary (verde) */
+  --color-primary-50: #e6fff7;
+  --color-primary-100: #ccfff0;
+  --color-primary-200: #99ffe1;
+  --color-primary-300: #66ffd2;
+  --color-primary-400: #33ffc3;
+  --color-primary-500: #00cc99;
+  --color-primary-600: #00a37a;
+  --color-primary-700: #007a5c;
+  --color-primary-800: #00523d;
+  --color-primary-900: #00291f;
+
+  /* Escalas de color secondary (gris azulado) */
+  --color-secondary-50: #f8fafc;
+  --color-secondary-100: #f1f5f9;
+  --color-secondary-200: #e2e8f0;
+  --color-secondary-300: #cbd5e1;
+  --color-secondary-400: #94a3b8;
+  --color-secondary-500: #64748b;
+  --color-secondary-600: #475569;
+  --color-secondary-700: #334155;
+  --color-secondary-800: #1e293b;
+  --color-secondary-900: #0f172a;
+
+  /* Colores semánticos */
+  --color-success: #10b981;
+  --color-warning: #f59e0b;
+  --color-error: #ef4444;
+  --color-info: #3b82f6;
+
+  /* Sombras */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1);
+
+  /* Transiciones */
+  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-base: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 500ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 body {
   font-family: Arial, Helvetica, sans-serif;
   margin: 0;
   padding: 0;
-}
-
-/* Color palette utility classes - Background */
-.bg-color-white {
-  background-color: var(--color-white);
-}
-.bg-blue {
-  background-color: var(--blue);
-}
-.bg-green {
-  background-color: var(--green);
-}
-.bg-soft-gray {
-  background-color: var(--soft-gray);
-}
-.bg-hard-gray {
-  background-color: var(--hard-gray);
-}
-
-/* Color palette utility classes - Text */
-.text-color-white {
-  color: var(--color-white);
-}
-.text-blue {
-  color: var(--blue);
-}
-.text-green {
-  color: var(--green);
-}
-.text-soft-gray {
-  color: var(--soft-gray);
-}
-.text-hard-gray {
-  color: var(--hard-gray);
-}
-
-/* Color palette utility classes - Border */
-.border-color-white {
-  border-color: var(--color-white);
-}
-.border-blue {
-  border-color: var(--blue);
-}
-.border-green {
-  border-color: var(--green);
-}
-.border-soft-gray {
-  border-color: var(--soft-gray);
-}
-.border-hard-gray {
-  border-color: var(--hard-gray);
-}
-
-/* Hover variants */
-.hover\:border-green:hover {
-  border-color: var(--green) !important;
-}
-
-.hover\:border-blue:hover {
-  border-color: var(--blue) !important;
-}
-
-.input {
-  width: 350px;
-  height: 44px;
-  background-color: var(--hard-gray);
-  border-radius: 5px;
-  border: 2px solid var(--soft-gray);
-  color: var(--color-white);
-  font-size: 22px;
-  margin: 10px 10px;
-  outline: none;
-  padding: 0 0 0 15px;
-}
-
-.buttonRed {
-  width: 150px;
-  height: 44px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-top: 20px;
-  gap: 10px;
-  background-color: var(--hard-gray);
-  border-radius: 5px;
-  border: 2px solid #ff0000;
-  cursor: pointer;
-  color: white;
-  font-size: 22px;
-  transition: 0.7s;
-}
-
-.buttonRed:hover {
-  background-color: #ff0000;
-  color: black;
-}
-
-.input:focus {
-  border: none;
-  border: 2px solid var(--green);
-}
-
-.button {
-  width: 150px;
-  height: 44px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-top: 20px;
-  gap: 10px;
-  background-color: var(--hard-gray);
-  border-radius: 5px;
-  border: 2px solid var(--green);
-  cursor: pointer;
-  color: white;
-  font-size: 22px;
-  transition: 0.7s;
-}
-
-.button:hover {
-  background-color: var(--green);
-  color: black;
-}
-
-.button svg {
-  color: white;
-  transition: color 0.7s;
-}
-
-.button:hover svg {
-  color: black;
 }
