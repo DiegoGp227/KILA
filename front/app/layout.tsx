@@ -29,12 +29,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="es">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-hard-gray min-h-screen flex flex-col`}
-      >
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <SWRProvider>
-          <Header />
-          <div className="max-w-screen-2xl mx-auto flex-1 w-full bg-secondary-900">
+          <div className="app-container">
+            <Header />
             {children}
           </div>
         </SWRProvider>
