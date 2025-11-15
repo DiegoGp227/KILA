@@ -4,7 +4,8 @@ interface IStepsSistem {
 
 export default function StepsSistem({ StepActive }: IStepsSistem) {
   return (
-    <div className="flex justify-center items-center gap-8 my-20">
+    <div className="flex justify-center items-center gap-8 my-10
+    ">
       <div className={`step ${StepActive === 1 ? "active" : ""}`}>
         <div className="step-number">1</div>
         <div className="step-label">Cargar Factura</div>
