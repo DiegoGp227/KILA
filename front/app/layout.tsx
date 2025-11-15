@@ -2,6 +2,7 @@ import "../styles/global.css";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { SWRProvider } from "@/provider/swrProvider";
+import { LanguageProvider } from "./i18n/LanguageContext";
 import Header from "./components/organism/header";
 
 const geistSans = Geist({
@@ -31,10 +32,12 @@ export default function RootLayout({
     <html lang="es">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <SWRProvider>
-          <div className="app-container">
-            <Header />
-            {children}
-          </div>
+          <LanguageProvider>
+            <div className="app-container">
+              <Header />
+              {children}
+            </div>
+          </LanguageProvider>
         </SWRProvider>
       </body>
     </html>

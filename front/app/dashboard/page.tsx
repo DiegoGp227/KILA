@@ -1,11 +1,64 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
 import StatCard from "../components/molecules/StatCard";
 import InvoicesTable, { Invoice } from "../components/organism/InvoicesTable";
+import LineChart from "../components/molecules/LineChart";
+import DonutChart from "../components/molecules/DonutChart";
+import {
+  getAllValidations as getLocalValidations,
+  getValidationStats,
+  StoredValidation
+} from "../services/localStorage.service";
+import { getChartData, ChartDataPoint } from "../utils/chartData";
+import { exportValidationsToCSV, exportDetailedValidationsToCSV } from "../utils/exportCSV";
+import { useTranslation } from "../i18n/LanguageContext";
 
-// Sample data
-const invoicesData: Invoice[] = [
+// Convert StoredValidation to Invoice format
+function convertToInvoice(validation: StoredValidation): Invoice {
+  return {
+    id: validation.id,
+    filename: validation.filename,
+    supplier: validation.invoice_info.supplier || "N/A",
+    importer: validation.invoice_info.customer || "N/A",
+    status: validation.status,
+    errors: validation.errors.length,
+    warnings: validation.warnings.length,
+    amount: validation.invoice_info.total_amount || "$0",
+    currency: validation.invoice_info.currency || "USD",
+    items: validation.invoice_info.items_count || 0,
+    date: new Date(validation.timestamp).toLocaleString("es-ES", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    }),
+  };
+}
+
+function formatRelativeTime(timestamp: string): string {
+  const date = new Date(timestamp);
+  const now = new Date();
+  const diffMs = now.getTime() - date.getTime();
+  const diffMins = Math.floor(diffMs / 60000);
+  const diffHours = Math.floor(diffMs / 3600000);
+  const diffDays = Math.floor(diffMs / 86400000);
+
+  if (diffMins < 60) {
+    return `Hace ${diffMins} minuto${diffMins !== 1 ? 's' : ''}`;
+  } else if (diffHours < 24) {
+    return `Hace ${diffHours} hora${diffHours !== 1 ? 's' : ''}`;
+  } else if (diffDays < 7) {
+    return `Hace ${diffDays} día${diffDays !== 1 ? 's' : ''}`;
+  } else {
+    return date.toLocaleDateString("es-ES");
+  }
+}
+
+// Sample data (fallback)
+const invoicesDataSample: Invoice[] = [
   {
     id: "1",
     filename: "factura_importacion_2024_001.json",
@@ -88,24 +141,102 @@ const invoicesData: Invoice[] = [
 
 export default function DashboardPage() {
   const router = useRouter();
+  const t = useTranslation();
+  const [invoicesData, setInvoicesData] = useState<Invoice[]>([]);
+  const [validations, setValidations] = useState<StoredValidation[]>([]);
+  const [stats, setStats] = useState({
+    total: 0,
+    approved: 0,
+    rejected: 0,
+    warning: 0,
+    approval_rate: 0,
+  });
+  const [chartData, setChartData] = useState<ChartDataPoint[]>([]);
+  const [chartPeriod, setChartPeriod] = useState<"day" | "week" | "month">("day");
+  const [loading, setLoading] = useState(true);
+  const [showExportMenu, setShowExportMenu] = useState(false);
+
+  useEffect(() => {
+    function loadData() {
+      try {
+        // Get validations from localStorage
+        const loadedValidations = getLocalValidations();
+        const validationStats = getValidationStats();
+
+        // Store validations for export
+        setValidations(loadedValidations);
+
+        // Convert to Invoice format
+        if (loadedValidations.length > 0) {
+          const convertedData = loadedValidations.map(convertToInvoice);
+          setInvoicesData(convertedData);
+        }
+
+        setStats(validationStats);
+
+        // Prepare chart data
+        const data = getChartData(loadedValidations, chartPeriod);
+        setChartData(data);
+      } catch (error) {
+        console.error("Error loading dashboard data:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadData();
+
+    // Refresh data when window gains focus (to catch new validations)
+    const handleFocus = () => loadData();
+    window.addEventListener("focus", handleFocus);
+
+    return () => window.removeEventListener("focus", handleFocus);
+  }, [chartPeriod]);
+
+  const handleExportCSV = () => {
+    exportValidationsToCSV(validations);
+    setShowExportMenu(false);
+  };
+
+  const handleExportDetailedCSV = () => {
+    exportDetailedValidationsToCSV(validations);
+    setShowExportMenu(false);
+  };
+
+  // Close export menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (showExportMenu) {
+        setShowExportMenu(false);
+      }
+    };
+
+    if (showExportMenu) {
+      document.addEventListener("click", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("click", handleClickOutside);
+    };
+  }, [showExportMenu]);
 
   return (
     <div className="main-content">
       {/* Page Header */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-white mb-2">
-          Dashboard de Validaciones
+          {t.dashboard.title}
         </h1>
         <p className="text-secondary-400">
-          Monitoreo y gestión de facturas de importación - Normativa DIAN
+          {t.dashboard.subtitle}
         </p>
       </div>
 
       {/* Stats Grid */}
       <div className="stats-grid fade-in mb-8">
         <StatCard
-          label="Total Validaciones"
-          value={127}
+          label={t.dashboard.stats.totalValidations}
+          value={stats.total}
           valueColor="var(--primary-500)"
           trend={{
             direction: "up",
@@ -114,8 +245,8 @@ export default function DashboardPage() {
           }}
         />
         <StatCard
-          label="Tasa de Aprobación"
-          value="68%"
+          label={t.dashboard.stats.approvalRate}
+          value={`${stats.approval_rate.toFixed(1)}%`}
           valueColor="var(--success)"
           trend={{
             direction: "up",
@@ -124,8 +255,8 @@ export default function DashboardPage() {
           }}
         />
         <StatCard
-          label="Errores Críticos"
-          value={41}
+          label={t.dashboard.stats.rejected}
+          value={stats.rejected}
           valueColor="var(--error)"
           trend={{
             direction: "down",
@@ -134,8 +265,8 @@ export default function DashboardPage() {
           }}
         />
         <StatCard
-          label="Advertencias"
-          value={89}
+          label={t.dashboard.stats.withWarnings}
+          value={stats.warning}
           valueColor="var(--warning)"
           trend={{
             direction: "neutral",
@@ -148,43 +279,44 @@ export default function DashboardPage() {
       <div className="charts-grid fade-in mb-8">
         <div className="card">
           <div className="card-header">
-            <h3 className="card-title">📊 Validaciones por Día</h3>
+            <h3 className="card-title">📊 {t.dashboard.charts.validationsOverTime}</h3>
             <div className="flex gap-2">
-              <button className="btn btn-ghost">7D</button>
-              <button className="btn btn-ghost">30D</button>
-              <button className="btn btn-ghost">90D</button>
+              <button
+                className={`btn ${chartPeriod === "day" ? "btn-primary" : "btn-ghost"}`}
+                onClick={() => setChartPeriod("day")}
+              >
+                {t.dashboard.charts.days7}
+              </button>
+              <button
+                className={`btn ${chartPeriod === "week" ? "btn-primary" : "btn-ghost"}`}
+                onClick={() => setChartPeriod("week")}
+              >
+                {t.dashboard.charts.weeks4}
+              </button>
+              <button
+                className={`btn ${chartPeriod === "month" ? "btn-primary" : "btn-ghost"}`}
+                onClick={() => setChartPeriod("month")}
+              >
+                {t.dashboard.charts.months3}
+              </button>
             </div>
           </div>
           <div className="card-body">
-            <div className="chart-placeholder">
-              <div className="text-5xl">📈</div>
-              <div>Gráfico de líneas - Validaciones en el tiempo</div>
-              <div className="text-xs text-secondary-500 mt-2">
-                Integración con Chart.js o similar
-              </div>
-            </div>
+            <LineChart data={chartData} height={200} />
           </div>
         </div>
 
         <div className="card">
           <div className="card-header">
-            <h3 className="card-title">🎯 Por Estado</h3>
+            <h3 className="card-title">🎯 {t.dashboard.charts.distributionByStatus}</h3>
           </div>
           <div className="card-body">
-            <div className="chart-placeholder" style={{ minHeight: "200px" }}>
-              <div className="text-5xl">🍩</div>
-              <div>Gráfico de dona</div>
-              <div className="mt-4 w-full">
-                <div className="flex justify-between mb-2">
-                  <span className="text-success">✓ Cumple</span>
-                  <span className="text-success font-bold">86</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-error">✕ No Cumple</span>
-                  <span className="text-error font-bold">41</span>
-                </div>
-              </div>
-            </div>
+            <DonutChart
+              approved={stats.approved}
+              rejected={stats.rejected}
+              warning={stats.warning}
+              size={200}
+            />
           </div>
         </div>
       </div>
@@ -192,21 +324,90 @@ export default function DashboardPage() {
       {/* Invoices Table */}
       <div className="card fade-in">
         <div className="card-header">
-          <h3 className="card-title">📋 Historial de Validaciones</h3>
-          <div className="flex gap-2">
-            <button className="btn btn-outline">
-              <span>↓</span> Exportar CSV
-            </button>
-            <button className="btn btn-ghost">
-              <span>⚙️</span> Filtros
+          <h3 className="card-title">📋 {t.dashboard.table.title}</h3>
+          <div className="flex gap-2" style={{ position: "relative" }}>
+            <div style={{ position: "relative" }}>
+              <button
+                className="btn btn-outline"
+                disabled={invoicesData.length === 0}
+                onClick={() => setShowExportMenu(!showExportMenu)}
+              >
+                <span>↓</span> {t.dashboard.table.exportCSV}
+              </button>
+
+              {showExportMenu && invoicesData.length > 0 && (
+                <div
+                  style={{
+                    position: "absolute",
+                    top: "100%",
+                    right: 0,
+                    marginTop: "0.5rem",
+                    backgroundColor: "var(--bg-secondary)",
+                    border: "1px solid var(--border-color)",
+                    borderRadius: "var(--border-radius)",
+                    boxShadow: "0 4px 12px rgba(0, 0, 0, 0.3)",
+                    minWidth: "200px",
+                    zIndex: 1000,
+                  }}
+                >
+                  <button
+                    className="btn btn-ghost"
+                    onClick={handleExportCSV}
+                    style={{
+                      width: "100%",
+                      justifyContent: "flex-start",
+                      borderRadius: 0,
+                      padding: "0.75rem 1rem",
+                    }}
+                  >
+                    📊 {t.dashboard.table.exportSummary}
+                  </button>
+                  <button
+                    className="btn btn-ghost"
+                    onClick={handleExportDetailedCSV}
+                    style={{
+                      width: "100%",
+                      justifyContent: "flex-start",
+                      borderRadius: 0,
+                      padding: "0.75rem 1rem",
+                    }}
+                  >
+                    📋 {t.dashboard.table.exportDetailed}
+                  </button>
+                </div>
+              )}
+            </div>
+            <button
+              className="btn btn-ghost"
+              disabled={invoicesData.length === 0}
+            >
+              <span>⚙️</span> {t.dashboard.table.filters}
             </button>
           </div>
         </div>
 
-        <InvoicesTable
-          data={invoicesData}
-          onRowClick={(invoice) => router.push("/validation/results")}
-        />
+        {invoicesData.length === 0 ? (
+          <div className="card-body text-center" style={{ padding: "4rem 2rem" }}>
+            <div style={{ fontSize: "3rem", marginBottom: "1rem" }}>📋</div>
+            <h3 style={{ color: "white", marginBottom: "0.5rem" }}>
+              {t.dashboard.table.noValidations}
+            </h3>
+            <p className="text-muted" style={{ marginBottom: "1.5rem" }}>
+              {t.dashboard.table.startValidating}
+            </p>
+            <button
+              className="btn btn-primary"
+              onClick={() => router.push("/validation/home")}
+            >
+              {t.dashboard.table.newValidation}
+            </button>
+          </div>
+        ) : (
+          <InvoicesTable
+            data={invoicesData}
+            onRowClick={(invoice) => router.push(`/validation/results?id=${invoice.id}`)}
+          />
+        )}
       </div>
     </div>
   );

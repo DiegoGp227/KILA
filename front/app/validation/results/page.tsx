@@ -1,72 +1,62 @@
 "use client";
 
-import { useState, useMemo } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useMemo, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import StepsSistem from "@/app/components/organism/StepsSistem";
 import MetricsPanel from "@/app/components/organism/MetricsPanel";
 import SummaryCard from "@/app/components/molecules/SummaryCard";
 import ValidationItem from "@/app/components/molecules/ValidationItem";
 import JsonViewer from "@/app/components/molecules/JsonViewer";
-import { adaptRealInvoice, RealInvoice } from "@/app/utils/invoiceAdapter";
-import {
-  validateInvoice,
-  groupValidationsBySection,
-  getValidationStats,
-  ValidationResult,
-} from "@/app/utils/invoiceValidation";
-
-// Real invoice data example (from user's provided JSON)
-const realInvoiceData: RealInvoice = {
-  Fields: [
-    { Fields: "Supplier", Value: "Andes Global International LLC" },
-    { Fields: "SupplierTaxID", Value: "" },
-    { Fields: "SupplierCountry", Value: "USA" },
-    { Fields: "SupplierAddress", Value: "7901 4th St N STE 300, St. Petersburg, FL 33702, USA" },
-    { Fields: "Customer", Value: "C.I. IBLU S.A.S." },
-    { Fields: "CustomerTaxID", Value: "830.055.831-8" },
-    { Fields: "CustomerCountry", Value: "Colombia" },
-    { Fields: "CustomerAddress", Value: "Bogotá" },
-    { Fields: "InvoiceNumber", Value: "43855" },
-    { Fields: "InvoiceDate", Value: "2024-10-25" },
-    { Fields: "Currency", Value: "USD" },
-    { Fields: "TotalInvoiceValue", Value: "82,453.50" },
-    { Fields: "TransportMode", Value: "Maritime" },
-    { Fields: "PortOfLoading", Value: "Charleston" },
-    { Fields: "PortOfDischarge", Value: "Cartagena" },
-  ],
-  Table: [
-    {
-      Description: "FROZEN PORK SIRLOINS, BONE IN, SKIN ON, INDIVIDUALLY, VACUUM PACKED - SKIN PACK",
-      Quantity: "24,486.53",
-      UnitPrice: "3.37",
-      TotalAmount: "82,453.50",
-      NetWeight: "24,486.53",
-      CountryOfOrigin: "USA",
-    },
-  ],
-};
+import { getValidationById, StoredValidation } from "@/app/services/localStorage.service";
 
 export default function ResultsPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [showSuccess, setShowSuccess] = useState(false);
+  const [validation, setValidation] = useState<StoredValidation | null>(null);
 
-  // Convert real invoice to system format and validate
-  const adaptedInvoice = useMemo(() => adaptRealInvoice(realInvoiceData), []);
-  const validationResults = useMemo(() => validateInvoice(adaptedInvoice), [adaptedInvoice]);
-  const validationStats = useMemo(() => getValidationStats(validationResults), [validationResults]);
-  const groupedValidations = useMemo(
-    () => groupValidationsBySection(validationResults),
-    [validationResults]
-  );
+  const validationId = searchParams.get("id");
+  const filename = searchParams.get("filename") || "factura.json";
 
-  const errors = validationResults.filter((v) => v.severity === "error");
-  const warnings = validationResults.filter((v) => v.severity === "warning");
+  useEffect(() => {
+    // Load validation from localStorage
+    if (!validationId) {
+      router.push("/validation/home");
+      return;
+    }
 
-  // Calculate passed validations (total possible checks - errors - warnings)
+    const storedValidation = getValidationById(validationId);
+    if (!storedValidation) {
+      router.push("/validation/home");
+      return;
+    }
+
+    setValidation(storedValidation);
+  }, [validationId, router]);
+
+  if (!validation) {
+    return (
+      <div className="main-content">
+        <div className="text-center text-white">
+          <p>Cargando validación...</p>
+        </div>
+      </div>
+    );
+  }
+
+  const errors = validation.errors || [];
+  const warnings = validation.warnings || [];
+  const status = validation.status;
+
+  // Calculate totals
   const totalPossibleChecks = 35;
-  const passed = totalPossibleChecks - validationStats.total;
+  const passed = totalPossibleChecks - errors.length - warnings.length;
 
-  const status = errors.length > 0 ? "error" : warnings.length > 0 ? "warning" : "success";
+  // Prepare highlight fields for JSON viewer
+  const highlightFields = [
+    ...errors.map(e => ({ field: e.field, severity: "error" as const })),
+    ...warnings.map(w => ({ field: w.field, severity: "warning" as const }))
+  ];
 
   return (
     <div className="main-content">
@@ -85,11 +75,11 @@ export default function ResultsPage() {
       {/* Metrics Panel (Floating) */}
       <MetricsPanel
         status={status}
-        errors={validationStats.errors}
-        warnings={validationStats.warnings}
+        errors={errors.length}
+        warnings={warnings.length}
         passed={passed}
         total={totalPossibleChecks}
-        onNewValidation={() => router.push("/")}
+        onNewValidation={() => router.push("/validation/home")}
       />
 
       {/* Split View */}
@@ -110,9 +100,53 @@ export default function ResultsPage() {
             </div>
           </div>
 
+          {/* Legend for highlights */}
+          {(errors.length > 0 || warnings.length > 0) && (
+            <div
+              style={{
+                display: "flex",
+                gap: "1rem",
+                marginBottom: "1rem",
+                padding: "0.75rem",
+                backgroundColor: "rgba(255, 255, 255, 0.03)",
+                borderRadius: "var(--border-radius)",
+                fontSize: "0.875rem",
+              }}
+            >
+              {errors.length > 0 && (
+                <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                  <div
+                    style={{
+                      width: "16px",
+                      height: "16px",
+                      backgroundColor: "rgba(239, 68, 68, 0.2)",
+                      border: "1px solid var(--error)",
+                      borderRadius: "3px",
+                    }}
+                  />
+                  <span className="text-secondary-300">Errores</span>
+                </div>
+              )}
+              {warnings.length > 0 && (
+                <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                  <div
+                    style={{
+                      width: "16px",
+                      height: "16px",
+                      backgroundColor: "rgba(251, 191, 36, 0.2)",
+                      border: "1px solid var(--warning)",
+                      borderRadius: "3px",
+                    }}
+                  />
+                  <span className="text-secondary-300">Advertencias</span>
+                </div>
+              )}
+            </div>
+          )}
+
           <JsonViewer
-            data={realInvoiceData}
-            highlightErrors={["SupplierTaxID"]}
+            data={validation.invoice_data}
+            highlightFields={highlightFields}
           />
         </div>
 
@@ -123,24 +157,24 @@ export default function ResultsPage() {
               🔍 Resultados de Validación
             </h2>
             <p className="text-secondary-400 text-sm">
-              factura_importacion_2024_001.json
+              {validation.filename}
             </p>
           </div>
 
           {/* Summary Card */}
           <SummaryCard
             status={status}
-            title={status === "error" ? "No Cumple" : status === "warning" ? "Con Advertencias" : "Cumple"}
+            title={status === "rejected" ? "No Cumple" : status === "warning" ? "Con Advertencias" : "Cumple"}
             description={
-              status === "error"
+              status === "rejected"
                 ? "La factura presenta errores que deben corregirse"
                 : status === "warning"
                 ? "La factura tiene advertencias que deberían revisarse"
                 : "La factura cumple con todas las validaciones"
             }
-            icon={status === "error" ? "❌" : status === "warning" ? "⚠️" : "✅"}
-            errors={validationStats.errors}
-            warnings={validationStats.warnings}
+            icon={status === "rejected" ? "❌" : status === "warning" ? "⚠️" : "✅"}
+            errors={errors.length}
+            warnings={warnings.length}
             passed={passed}
           />
 

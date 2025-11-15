@@ -1,15 +1,17 @@
 "use client";
 import { usePathname, useRouter } from "next/navigation";
 import { useState, useRef, useEffect } from "react";
+import { useLanguage } from "@/app/i18n/LanguageContext";
 
 function Header() {
   const router = useRouter();
   const pathname = usePathname();
+  const { language, setLanguage } = useLanguage();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const hiddenRoutes = ["/sign_up", "/login", "/not-found"];
+  const hiddenRoutes = ["/sign_up", "/login", "/not-found", "/"];
 
   // Verificamos si coincide exactamente con alguna
   const hideHeader = hiddenRoutes.includes(pathname);
@@ -69,6 +71,10 @@ function Header() {
     router.push("/login");
   };
 
+  const toggleLanguage = () => {
+    setLanguage(language === "es" ? "en" : "es");
+  };
+
   return (
     <header className={`header ${hideHeader ? "hidden" : ""}`}>
       {/* Logo */}
@@ -84,6 +90,19 @@ function Header() {
 
       {/* User Menu */}
       <div className="user-menu" ref={dropdownRef}>
+        {/* Toggle idioma */}
+        <button
+          className="btn btn-ghost"
+          onClick={toggleLanguage}
+          title={language === "es" ? "Switch to English" : "Cambiar a Español"}
+          style={{
+            fontWeight: "bold",
+            fontSize: "0.875rem",
+          }}
+        >
+          {language === "es" ? "🇬🇧 EN" : "🇪🇸 ES"}
+        </button>
+
         {/* Toggle tema */}
         <button className="btn btn-ghost" onClick={toggleTheme}>
           <span>{isDarkMode ? "☀️" : "🌙"}</span>

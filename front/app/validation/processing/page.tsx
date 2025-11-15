@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import StepsSistem from "@/app/components/organism/StepsSistem";
 import ProcessingSpinner from "@/app/components/atoms/ProcessingSpinner";
 import ProgressBar from "@/app/components/atoms/ProgressBar";
@@ -19,15 +19,25 @@ const validationSteps = [
 
 export default function ProcessingPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [currentStep, setCurrentStep] = useState(0);
   const [progress, setProgress] = useState(0);
 
+  const validationId = searchParams.get("id");
+  const filename = searchParams.get("filename") || "factura.json";
+
   useEffect(() => {
+    // Redirect if no validation ID
+    if (!validationId) {
+      router.push("/validation/home");
+      return;
+    }
+
     if (currentStep >= validationSteps.length) {
       // All steps completed
       setProgress(100);
       setTimeout(() => {
-        router.push("/validation/results");
+        router.push(`/validation/results?id=${validationId}`);
       }, 1000);
       return;
     }
@@ -38,7 +48,7 @@ export default function ProcessingPage() {
     }, validationSteps[currentStep].duration);
 
     return () => clearTimeout(timer);
-  }, [currentStep, router]);
+  }, [currentStep, router, validationId]);
 
   const getStepStatus = (index: number) => {
     if (index < currentStep) return "completed";

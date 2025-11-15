@@ -1,0 +1,99 @@
+{
+  "Fields": [
+    {
+      "Fields": "Supplier",
+      "Value": ""
+    },
+    {
+      "Fields": "Customer",
+      "Value": "C.I. IBLU S.A.S."
+    },
+    {
+      "Fields": "SupplierAddress",
+      "Value": ""
+    },
+    {
+      "Fields": "SupplierTaxID",
+      "Value": ""
+    },
+    {
+      "Fields": "CustomerAddress",
+      "Value": "CALLE 31 NO 44-145\nMEDELLIN COLOMBIA"
+    },
+    {
+      "Fields": "CustomerTaxID",
+      "Value": "890.932-279-6"
+    },
+    {
+      "Fields": "InvoiceNumber",
+      "Value": "201834"
+    },
+    {
+      "Fields": "InvoiceDate",
+      "Value": ""
+    },
+    {
+      "Fields": "PaymentTerms",
+      "Value": "45 DAYS FROM BILL OF LADING"
+    },
+    {
+      "Fields": "CountryOfOrigin",
+      "Value": ""
+    },
+    {
+      "Fields": "PortOfLoading",
+      "Value": ""
+    },
+    {
+      "Fields": "PortOfDischarge",
+      "Value": "Cartagena, Colombia"
+    },
+    {
+      "Fields": "Incoterm",
+      "Value": "CIP"
+    },
+    {
+      "Fields": "Currency",
+      "Value": "USD"
+    },
+    {
+      "Fields": "TotalInvoiceValue",
+      "Value": "23809.3"
+    },
+    {
+      "Fields": "ExporterContact",
+      "Value": "Andres Gallego"
+    },
+    {
+      "Fields": "ImporterContact",
+      "Value": ""
+    },
+    {
+      "Fields": "ShippingMark",
+      "Value": ""
+    },
+    {
+      "Fields": "InvoiceType",
+      "Value": "INVOICE"
+    },
+    {
+      "Fields": "OriginCountryAddress",
+      "Value": ""
+    }
+  ],
+  "Table": [
+    {
+      "SKU": "75002-002",
+      "Description": "Frozen Mech Separated Chicken 20% down Pasta de Pollo",
+      "Quantity": "26,308.62",
+      "UnitOfMeasurement": "KGS",
+      "UnitPrice": "0.905",
+      "NetValuePerItem": "23,809.30",
+      "Currency": "USD",
+      "HSCode": "",
+      "Weight": "",
+      "BatchOrLotNumber": "",
+      "NumberOfPackagesBoxes": "1,450CS"
+    }
+  ]
+}
