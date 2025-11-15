@@ -8,13 +8,13 @@ import ProgressBar from "@/app/components/atoms/ProgressBar";
 import ValidationStep from "@/app/components/molecules/ValidationStep";
 
 const validationSteps = [
-  { id: 1, title: "Estructura del archivo JSON", duration: 1000 },
-  { id: 2, title: "Datos del proveedor", duration: 1500 },
-  { id: 3, title: "Datos del importador", duration: 2000 },
-  { id: 4, title: "Detalle de mercancía", duration: 1800 },
-  { id: 5, title: "Información de transporte", duration: 1200 },
-  { id: 6, title: "Validación cruzada de cálculos", duration: 1500 },
-  { id: 7, title: "Conformidad DIAN (CT-COA-0124)", duration: 1000 },
+  { id: 1, title: "Estructura del archivo JSON", duration: 800, validates: "JSON format" },
+  { id: 2, title: "Datos del proveedor", duration: 1200, validates: "supplier fields" },
+  { id: 3, title: "Datos del importador", duration: 1200, validates: "customer fields" },
+  { id: 4, title: "Información de factura", duration: 1000, validates: "invoice fields" },
+  { id: 5, title: "Detalle de items", duration: 1500, validates: "items validation" },
+  { id: 6, title: "Información de transporte", duration: 800, validates: "transport fields" },
+  { id: 7, title: "Validaciones numéricas", duration: 1000, validates: "numeric validations" },
 ];
 
 export default function ProcessingPage() {

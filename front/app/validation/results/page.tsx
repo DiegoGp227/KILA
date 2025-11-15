@@ -1,109 +1,72 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import StepsSistem from "@/app/components/organism/StepsSistem";
 import MetricsPanel from "@/app/components/organism/MetricsPanel";
 import SummaryCard from "@/app/components/molecules/SummaryCard";
 import ValidationItem from "@/app/components/molecules/ValidationItem";
 import JsonViewer from "@/app/components/molecules/JsonViewer";
+import { adaptRealInvoice, RealInvoice } from "@/app/utils/invoiceAdapter";
+import {
+  validateInvoice,
+  groupValidationsBySection,
+  getValidationStats,
+  ValidationResult,
+} from "@/app/utils/invoiceValidation";
 
-// Sample data
-const sampleInvoice = {
-  factura: {
-    numero: "INV-2024-001",
-    fecha: "2024-01-15",
-    moneda: "USD",
-  },
-  proveedor: {
-    nombre: "Tech Supplies China Ltd.",
-    pais: "China",
-    direccion: "123 Industrial Zone, Shenzhen",
-    telefono: "+86 755 1234567",
-  },
-  importador: {
-    razonSocial: "",
-    nit: "900123456",
-    direccion: "Calle 100 #15-20, Bogotá",
-    ciudad: "Bogotá",
-    pais: "Colombia",
-  },
-  mercancia: [
+// Real invoice data example (from user's provided JSON)
+const realInvoiceData: RealInvoice = {
+  Fields: [
+    { Fields: "Supplier", Value: "Andes Global International LLC" },
+    { Fields: "SupplierTaxID", Value: "" },
+    { Fields: "SupplierCountry", Value: "USA" },
+    { Fields: "SupplierAddress", Value: "7901 4th St N STE 300, St. Petersburg, FL 33702, USA" },
+    { Fields: "Customer", Value: "C.I. IBLU S.A.S." },
+    { Fields: "CustomerTaxID", Value: "830.055.831-8" },
+    { Fields: "CustomerCountry", Value: "Colombia" },
+    { Fields: "CustomerAddress", Value: "Bogotá" },
+    { Fields: "InvoiceNumber", Value: "43855" },
+    { Fields: "InvoiceDate", Value: "2024-10-25" },
+    { Fields: "Currency", Value: "USD" },
+    { Fields: "TotalInvoiceValue", Value: "82,453.50" },
+    { Fields: "TransportMode", Value: "Maritime" },
+    { Fields: "PortOfLoading", Value: "Charleston" },
+    { Fields: "PortOfDischarge", Value: "Cartagena" },
+  ],
+  Table: [
     {
-      descripcion: "Laptop Dell XPS 15",
-      cantidad: 50,
-      precioUnitario: 1200.0,
-      total: 60000.0,
-      pesoUnitario: 2.1,
-    },
-    {
-      descripcion: "",
-      cantidad: 100,
-      precioUnitario: 25.0,
-      total: 2500.0,
+      Description: "FROZEN PORK SIRLOINS, BONE IN, SKIN ON, INDIVIDUALLY, VACUUM PACKED - SKIN PACK",
+      Quantity: "24,486.53",
+      UnitPrice: "3.37",
+      TotalAmount: "82,453.50",
+      NetWeight: "24,486.53",
+      CountryOfOrigin: "USA",
     },
   ],
-  transporte: {
-    incoterm: "FOB",
-    puertoOrigen: "Shenzhen Port",
-    puertoDestino: "Buenaventura",
-  },
-  totales: {
-    subtotal: 62500.0,
-    descuento: 0.0,
-    total: 62000.0,
-  },
 };
 
 export default function ResultsPage() {
   const router = useRouter();
   const [showSuccess, setShowSuccess] = useState(false);
 
-  const errors = [
-    {
-      title: "Razón Social del Importador Vacía",
-      description:
-        'El campo <code style="background: var(--secondary-600); padding: 0.125rem 0.375rem; border-radius: 4px;">importador.razonSocial</code> es obligatorio y no puede estar vacío según la normativa DIAN.',
-      normReference: "📋 CT-COA-0124 - Sección 2.3",
-    },
-    {
-      title: "NIT sin Dígito de Verificación",
-      description:
-        'El NIT <code style="background: var(--secondary-600); padding: 0.125rem 0.375rem; border-radius: 4px;">900123456</code> debe incluir el dígito de verificación (formato: 900123456-X).',
-      normReference: "📋 CT-COA-0124 - Sección 2.3.2",
-    },
-    {
-      title: "Descripción de Mercancía Vacía",
-      description:
-        "El ítem #2 de mercancía tiene descripción vacía. Todas las mercancías deben tener descripción detallada.",
-      normReference: "📋 CT-COA-0124 - Sección 3.1",
-    },
-    {
-      title: "Error en Cálculo de Total",
-      description:
-        "El total general ($62,000) no coincide con la suma de subtotales ($62,500). Diferencia: $500.",
-      normReference: "📋 Validación Cruzada de Cálculos",
-    },
-  ];
+  // Convert real invoice to system format and validate
+  const adaptedInvoice = useMemo(() => adaptRealInvoice(realInvoiceData), []);
+  const validationResults = useMemo(() => validateInvoice(adaptedInvoice), [adaptedInvoice]);
+  const validationStats = useMemo(() => getValidationStats(validationResults), [validationResults]);
+  const groupedValidations = useMemo(
+    () => groupValidationsBySection(validationResults),
+    [validationResults]
+  );
 
-  const warnings = [
-    {
-      title: "Peso No Especificado",
-      description:
-        "El ítem #2 no tiene peso especificado. Recomendado para cálculos de flete.",
-    },
-    {
-      title: "Falta País de Fabricación",
-      description:
-        "No se especifica el país de fabricación de la mercancía.",
-    },
-  ];
+  const errors = validationResults.filter((v) => v.severity === "error");
+  const warnings = validationResults.filter((v) => v.severity === "warning");
 
-  const successItems = [
-    { title: "Datos del proveedor completos" },
-    { title: "Formato de fecha válido" },
-    { title: "Moneda válida (USD)" },
-  ];
+  // Calculate passed validations (total possible checks - errors - warnings)
+  const totalPossibleChecks = 35;
+  const passed = totalPossibleChecks - validationStats.total;
+
+  const status = errors.length > 0 ? "error" : warnings.length > 0 ? "warning" : "success";
 
   return (
     <div className="main-content">
@@ -121,12 +84,12 @@ export default function ResultsPage() {
 
       {/* Metrics Panel (Floating) */}
       <MetricsPanel
-        status="error"
-        errors={8}
-        warnings={3}
-        passed={24}
-        total={35}
-        onNewValidation={() => router.push("/validation")}
+        status={status}
+        errors={validationStats.errors}
+        warnings={validationStats.warnings}
+        passed={passed}
+        total={totalPossibleChecks}
+        onNewValidation={() => router.push("/")}
       />
 
       {/* Split View */}
@@ -148,8 +111,8 @@ export default function ResultsPage() {
           </div>
 
           <JsonViewer
-            data={sampleInvoice}
-            highlightErrors={["razonSocial", "nit", "descripcion", "total"]}
+            data={realInvoiceData}
+            highlightErrors={["SupplierTaxID"]}
           />
         </div>
 
@@ -166,74 +129,93 @@ export default function ResultsPage() {
 
           {/* Summary Card */}
           <SummaryCard
-            status="error"
-            title="No Cumple"
-            description="La factura presenta errores que deben corregirse"
-            icon="❌"
-            errors={8}
-            warnings={3}
-            passed={24}
+            status={status}
+            title={status === "error" ? "No Cumple" : status === "warning" ? "Con Advertencias" : "Cumple"}
+            description={
+              status === "error"
+                ? "La factura presenta errores que deben corregirse"
+                : status === "warning"
+                ? "La factura tiene advertencias que deberían revisarse"
+                : "La factura cumple con todas las validaciones"
+            }
+            icon={status === "error" ? "❌" : status === "warning" ? "⚠️" : "✅"}
+            errors={validationStats.errors}
+            warnings={validationStats.warnings}
+            passed={passed}
           />
 
           {/* Errors Section */}
-          <div>
-            <h3 className="text-white text-base mb-4">
-              ⚠️ Errores Encontrados (8)
-            </h3>
+          {errors.length > 0 && (
+            <div>
+              <h3 className="text-white text-base mb-4">
+                ⚠️ Errores Encontrados ({errors.length})
+              </h3>
 
-            {errors.map((error, index) => (
-              <ValidationItem
-                key={index}
-                type="error"
-                title={error.title}
-                description={error.description}
-                normReference={error.normReference}
-                onDetailClick={() => {}}
-              />
-            ))}
-          </div>
+              {errors.map((error, index) => (
+                <ValidationItem
+                  key={index}
+                  type="error"
+                  title={error.message}
+                  description={`Campo: ${error.field} | Sección: ${error.section}`}
+                  normReference="📋 Validación de Campos Requeridos"
+                  onDetailClick={() => {}}
+                />
+              ))}
+            </div>
+          )}
 
           {/* Warnings Section */}
-          <div className="mt-8">
-            <h3 className="text-white text-base mb-4">
-              ⚡ Advertencias (3)
-            </h3>
+          {warnings.length > 0 && (
+            <div className="mt-8">
+              <h3 className="text-white text-base mb-4">
+                ⚡ Advertencias ({warnings.length})
+              </h3>
 
-            {warnings.map((warning, index) => (
-              <ValidationItem
-                key={index}
-                type="warning"
-                title={warning.title}
-                description={warning.description}
-              />
-            ))}
-          </div>
+              {warnings.map((warning, index) => (
+                <ValidationItem
+                  key={index}
+                  type="warning"
+                  title={warning.message}
+                  description={`Campo: ${warning.field} | Sección: ${warning.section}`}
+                />
+              ))}
+            </div>
+          )}
 
           {/* Success Section (Collapsible) */}
-          <div className="mt-8">
-            <button
-              className="btn btn-ghost w-full justify-between"
-              onClick={() => setShowSuccess(!showSuccess)}
-            >
-              <span>✅ Validaciones Exitosas (24)</span>
-              <span>{showSuccess ? "▲" : "▼"}</span>
-            </button>
-            {showSuccess && (
-              <div className="mt-4 space-y-2">
-                {successItems.map((item, index) => (
+          {passed > 0 && (
+            <div className="mt-8">
+              <button
+                className="btn btn-ghost w-full justify-between"
+                onClick={() => setShowSuccess(!showSuccess)}
+              >
+                <span>✅ Validaciones Exitosas ({passed})</span>
+                <span>{showSuccess ? "▲" : "▼"}</span>
+              </button>
+              {showSuccess && (
+                <div className="mt-4 space-y-2">
                   <ValidationItem
-                    key={index}
                     type="success"
-                    title={item.title}
-                    description=""
+                    title="Formato de fecha válido"
+                    description="InvoiceDate cumple con el formato requerido"
                   />
-                ))}
-                <p className="text-secondary-400 text-center text-sm mt-4">
-                  + 21 validaciones más...
-                </p>
-              </div>
-            )}
-          </div>
+                  <ValidationItem
+                    type="success"
+                    title="Moneda válida"
+                    description="Currency es un código válido (USD)"
+                  />
+                  <ValidationItem
+                    type="success"
+                    title="Items presentes"
+                    description="La factura contiene items de mercancía"
+                  />
+                  <p className="text-secondary-400 text-center text-sm mt-4">
+                    + {Math.max(0, passed - 3)} validaciones más...
+                  </p>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </div>
