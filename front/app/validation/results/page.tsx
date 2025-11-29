@@ -48,6 +48,12 @@ export default function ResultsPage() {
   const warnings = validation.warnings || [];
   const status = validation.status;
 
+  // Map status to MetricsPanel expected format
+  const metricsStatus: "success" | "error" | "warning" =
+    status === "approved" ? "success" :
+    status === "rejected" ? "error" :
+    "warning";
+
   // Calculate totals
   const totalPossibleChecks = 35;
   const passed = totalPossibleChecks - errors.length - warnings.length;
@@ -74,7 +80,7 @@ export default function ResultsPage() {
 
       {/* Metrics Panel (Floating) */}
       <MetricsPanel
-        status={status}
+        status={metricsStatus}
         errors={errors.length}
         warnings={warnings.length}
         passed={passed}
@@ -178,6 +184,25 @@ export default function ResultsPage() {
             passed={passed}
           />
 
+          {/* Validation Source Info */}
+          {validation.validation_source && (
+            <div className="mb-6 p-3 bg-info/10 border border-info/20 rounded-lg">
+              <div className="flex items-center gap-2 text-sm text-secondary-300">
+                <span>🔍 Fuente de validación:</span>
+                <span className="font-semibold text-white">
+                  {validation.validation_source === "frontend" && "Frontend (DIAN)"}
+                  {validation.validation_source === "backend" && "Backend API"}
+                  {validation.validation_source === "merged" && "Frontend + Backend (Frontend prioritario)"}
+                </span>
+                {validation.conflict_resolution && validation.conflict_resolution.conflicts_found > 0 && (
+                  <span className="text-warning text-xs">
+                    • {validation.conflict_resolution.conflicts_found} conflicto(s) resuelto(s)
+                  </span>
+                )}
+              </div>
+            </div>
+          )}
+
           {/* Errors Section */}
           {errors.length > 0 && (
             <div>
@@ -191,7 +216,11 @@ export default function ResultsPage() {
                   type="error"
                   title={error.message}
                   description={`Campo: ${error.field} | Sección: ${error.section}`}
-                  normReference="📋 Validación de Campos Requeridos"
+                  normReference={
+                    error.requirementNumber
+                      ? `📋 Requisito DIAN #${error.requirementNumber} ${error.allowsPartialCompliance ? "(✅ Permite cumplimiento parcial)" : "(❌ No permite cumplimiento parcial)"}`
+                      : "📋 Validación de Campos Requeridos"
+                  }
                   onDetailClick={() => {}}
                 />
               ))}
@@ -210,7 +239,11 @@ export default function ResultsPage() {
                   key={index}
                   type="warning"
                   title={warning.message}
-                  description={`Campo: ${warning.field} | Sección: ${warning.section}`}
+                  description={`Campo: ${warning.field} | Sección: ${warning.section}${
+                    warning.requirementNumber
+                      ? ` | Requisito DIAN #${warning.requirementNumber}`
+                      : ""
+                  }`}
                 />
               ))}
             </div>

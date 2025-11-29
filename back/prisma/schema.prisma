@@ -1,0 +1,41 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Usuario {
+  id                   Int                    @id @default(autoincrement())
+  email                String                 @unique @db.VarChar(255)
+  passwordHash         String                 @map("password_hash") @db.VarChar(255)
+  createdAt            DateTime               @default(now()) @map("created_at")
+  updatedAt            DateTime               @default(now()) @updatedAt @map("updated_at")
+  validacionesFacturas ValidacionFactura[]
+
+  @@map("usuarios")
+}
+
+model ValidacionFactura {
+  id               Int      @id @default(autoincrement())
+  facturaId        String   @map("factura_id") @db.VarChar(100)
+  usuarioId        Int?     @map("usuario_id")
+  fechaValidacion  DateTime @default(now()) @map("fecha_validacion")
+  paso             Boolean
+  errores          Json     @default("[]")
+  advertencias     Json     @default("[]")
+  datosFactura     Json?    @map("datos_factura")
+
+  usuario          Usuario? @relation(fields: [usuarioId], references: [id], onDelete: SetNull)
+
+  @@index([facturaId], map: "idx_validaciones_factura_id")
+  @@index([fechaValidacion(sort: Desc)], map: "idx_validaciones_fecha")
+  @@index([usuarioId], map: "idx_validaciones_usuario")
+  @@index([paso], map: "idx_validaciones_paso")
+  @@map("validaciones_facturas")
+}

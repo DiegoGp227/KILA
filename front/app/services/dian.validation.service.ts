@@ -488,62 +488,75 @@ function validatePrices(data: any, errors: ValidationError[], warnings: Validati
 
 /**
  * 9. Validate currency
+ * ❌ No permite cumplimiento parcial
  */
 function validateCurrency(data: any, errors: ValidationError[]) {
   const currency = data?.currency || data?.currency_code;
 
   if (!currency || currency.trim() === "") {
     errors.push({
-      field: "currency",
+      field: "Currency",
       message: "La moneda de la transacción es obligatoria",
       section: "Información de Factura",
       severity: "error",
+      requirementNumber: 9,
+      allowsPartialCompliance: false,
     });
   } else if (!VALID_CURRENCIES.includes(currency.toUpperCase())) {
     errors.push({
-      field: "currency",
+      field: "Currency",
       message: `La moneda "${currency}" no es válida. Monedas permitidas: ${VALID_CURRENCIES.join(", ")}`,
       section: "Información de Factura",
       severity: "error",
+      requirementNumber: 9,
+      allowsPartialCompliance: false,
     });
   }
 }
 
 /**
  * 10. Validate Incoterm
+ * ❌ No permite cumplimiento parcial
  */
 function validateIncoterm(data: any, errors: ValidationError[]) {
   const incoterm = data?.incoterm || data?.delivery_terms || data?.deliveryTerms;
 
   if (!incoterm || incoterm.trim() === "") {
     errors.push({
-      field: "incoterm",
+      field: "Incoterm",
       message: "El Incoterm (condiciones de entrega) es obligatorio",
       section: "Información de Transporte",
       severity: "error",
+      requirementNumber: 10,
+      allowsPartialCompliance: false,
     });
   } else if (!VALID_INCOTERMS.includes(incoterm.toUpperCase())) {
     errors.push({
-      field: "incoterm",
+      field: "Incoterm",
       message: `El Incoterm "${incoterm}" no es válido. Incoterms permitidos: ${VALID_INCOTERMS.join(", ")}`,
       section: "Información de Transporte",
       severity: "error",
+      requirementNumber: 10,
+      allowsPartialCompliance: false,
     });
   }
 }
 
 /**
  * 11. Validate payment method
+ * ✅ Permite cumplimiento parcial (si hay indicios, aunque no explícito)
  */
 function validatePaymentMethod(data: any, errors: ValidationError[], warnings: ValidationError[]) {
   const paymentMethod = data?.payment_method || data?.paymentMethod || data?.payment_terms;
 
   if (!paymentMethod || paymentMethod.trim() === "") {
     warnings.push({
-      field: "payment_method",
+      field: "PaymentTerms",
       message: "No se especifica forma de pago (directa o indirecta)",
       section: "Información de Factura",
       severity: "warning",
+      requirementNumber: 11,
+      allowsPartialCompliance: true,
     });
   } else {
     // Check if it's clear whether it's direct or indirect
@@ -556,14 +569,19 @@ function validatePaymentMethod(data: any, errors: ValidationError[], warnings: V
       methodLower.includes("transferencia") ||
       methodLower.includes("wire transfer") ||
       methodLower.includes("contado") ||
-      methodLower.includes("cash");
+      methodLower.includes("cash") ||
+      methodLower.includes("days") ||
+      methodLower.includes("net") ||
+      methodLower.includes("bl"); // Bill of lading
 
     if (!isDirectOrIndirect) {
       warnings.push({
-        field: "payment_method",
+        field: "PaymentTerms",
         message: `La forma de pago "${paymentMethod}" no especifica claramente si es directa o indirecta`,
         section: "Información de Factura",
         severity: "warning",
+        requirementNumber: 11,
+        allowsPartialCompliance: true,
       });
     }
   }

@@ -1,7 +1,7 @@
 "use client";
 import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { validateInvoiceWithAPI } from "@/app/services/validation.service";
+import { validateInvoiceIntegrated } from "@/app/services/validation.integration.service";
 import { saveValidation, extractInvoiceInfo } from "@/app/services/localStorage.service";
 import { REQUEST_CONFIG } from "@/app/config/urls";
 
@@ -57,14 +57,14 @@ export default function UploadSistem() {
     setUploading(true);
 
     try {
-      // Call external validation API
-      const response = await validateInvoiceWithAPI(file);
+      // Call INTEGRATED validation (frontend + backend, frontend priority)
+      const response = await validateInvoiceIntegrated(file);
 
       if (response.success && response.validation_id) {
         // Extract invoice info
         const invoiceInfo = extractInvoiceInfo(response.invoice_data);
 
-        // Save to localStorage
+        // Save to localStorage with validation source info
         saveValidation({
           id: response.validation_id,
           filename: file.name,
@@ -74,6 +74,10 @@ export default function UploadSistem() {
           warnings: response.warnings || [],
           status: response.status || "approved",
           invoice_info: invoiceInfo,
+          validation_source: response.source,
+          frontend_validation: response.frontend_validation,
+          backend_validation: response.backend_validation,
+          conflict_resolution: response.conflict_resolution,
         });
 
         // Navigate to processing page

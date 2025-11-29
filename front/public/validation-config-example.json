@@ -1,0 +1,58 @@
+{
+  "validIncoterms": [
+    "FOB",
+    "CIF",
+    "EXW",
+    "FCA",
+    "CPT",
+    "CIP",
+    "DAP",
+    "DPU",
+    "DDP",
+    "FAS",
+    "CFR"
+  ],
+  "validCurrencies": [
+    "USD",
+    "EUR",
+    "COP",
+    "GBP",
+    "JPY",
+    "CNY",
+    "CAD",
+    "AUD",
+    "CHF",
+    "MXN"
+  ],
+  "thresholds": {
+    "minDescriptionLength": 10,
+    "priceTolerancePercent": 1.0
+  },
+  "enabledRequirements": {
+    "req1_invoiceNumber": true,
+    "req2_issueDate": true,
+    "req3_issuePlace": true,
+    "req4_supplierInfo": true,
+    "req5_customerInfo": true,
+    "req6_itemDescription": true,
+    "req7_quantities": true,
+    "req8_prices": true,
+    "req9_currency": true,
+    "req10_incoterm": true,
+    "req11_paymentMethod": true
+  },
+  "genericTerms": [
+    "producto",
+    "product",
+    "item",
+    "mercancía",
+    "merchandise",
+    "goods",
+    "artículo",
+    "article",
+    "material",
+    "componente",
+    "component"
+  ],
+  "strictMode": false
+}

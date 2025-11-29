@@ -11,16 +11,22 @@ export default function Actions() {
         display: "flex",
         gap: "1rem",
         justifyContent: "center",
+        flexWrap: "wrap",
       }}
     >
       <button
         className="btn btn-outline"
-        onClick={() => {
-          router.push("/dashboard");
-        }}
+        onClick={() => router.push("/dashboard")}
       >
         <span>📊</span>
         Ver Dashboard
+      </button>
+      <button
+        className="btn btn-outline"
+        onClick={() => router.push("/settings")}
+      >
+        <span>⚙️</span>
+        Configuración
       </button>
       <button className="btn btn-ghost">
         <span>📖</span>

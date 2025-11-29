@@ -14,7 +14,6 @@ export default function ValidationPage() {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
     if (selectedFile) {
-      // Validate it's a JSON file
       if (!selectedFile.name.endsWith(".json")) {
         setError("Por favor selecciona un archivo JSON válido");
         setFile(null);

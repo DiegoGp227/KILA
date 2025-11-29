@@ -12,12 +12,16 @@ export interface StoredValidation {
     message: string;
     section: string;
     severity: "error";
+    requirementNumber?: number;
+    allowsPartialCompliance?: boolean;
   }>;
   warnings: Array<{
     field: string;
     message: string;
     section: string;
     severity: "warning";
+    requirementNumber?: number;
+    allowsPartialCompliance?: boolean;
   }>;
   status: "approved" | "rejected" | "warning";
   invoice_info: {
@@ -28,6 +32,13 @@ export interface StoredValidation {
     currency?: string;
     date?: string;
     items_count?: number;
+  };
+  validation_source?: "frontend" | "backend" | "merged";
+  frontend_validation?: any;
+  backend_validation?: any;
+  conflict_resolution?: {
+    fronted_prioritized: boolean;
+    conflicts_found: number;
   };
 }
 
