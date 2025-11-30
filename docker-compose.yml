@@ -1,14 +1,17 @@
+version: '3.8'
+
 services:
   postgres:
     image: postgres:16-alpine
     container_name: kila_postgres
-    restart: always
+    restart: unless-stopped
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
-    ports:
-      - "5433:5432"
+    # ❌ ELIMINAR esto si solo el backend accede a la DB
+    # ports:
+    #   - "5433:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
@@ -20,19 +23,19 @@ services:
       retries: 5
 
   backend:
-    build: ./back
+    build: 
+      context: ./back
+      dockerfile: Dockerfile
     container_name: kila_backend
-    restart: always
+    restart: unless-stopped
     depends_on:
       postgres:
         condition: service_healthy
     environment:
+      NODE_ENV: production
       PORT: ${PORT}
-      DB_HOST: postgres
-      DB_PORT: 5432
-      DB_USER: ${POSTGRES_USER}
-      DB_PASSWORD: ${POSTGRES_PASSWORD}
-      DB_DATABASE: ${POSTGRES_DB}
+      # ✅ Prisma necesita esto
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
       JWT_SECRET: ${JWT_SECRET}
       TOKEN_EXPIRATION: ${TOKEN_EXPIRATION}
       API_KEY: ${API_KEY}
@@ -40,11 +43,14 @@ services:
       - "4003:${PORT}"
     networks:
       - kila_network
+    command: sh -c "npx prisma migrate deploy && npx prisma generate && npm start"
 
   frontend:
-    build: ./front
+    build:
+      context: ./front
+      dockerfile: Dockerfile
     container_name: kila_frontend
-    restart: always
+    restart: unless-stopped
     depends_on:
       - backend
     environment:
@@ -60,3 +66,4 @@ networks:
 
 volumes:
   postgres_data:
+    driver: local
