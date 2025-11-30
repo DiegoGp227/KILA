@@ -1,7 +1,7 @@
 import bcrypt from "bcryptjs";
 import prisma from "../../db/prisma.js";
-import { ICreateUser, ILoginUser, IUserResponse } from "../../types/user.types";
-import { EmailAlreadyInUseError, InvalidCredentialsError } from "../../erros/businessErrors";
+import { ICreateUser, ILoginUser, IUserResponse } from "../../types/user.types.js";
+import { EmailAlreadyInUseError, InvalidCredentialsError } from "../../erros/businessErrors.js";
 
 export const createUser = async (
   userData: ICreateUser

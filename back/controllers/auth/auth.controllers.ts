@@ -1,9 +1,9 @@
 import { Request, Response } from "express";
 import jwt, { SignOptions } from "jsonwebtoken";
-import { loginSchema, signupSchema } from "../../validators/user.validator";
-import { ValidationError, AppError } from "../../erros/appError";
-import { InternalServerError } from "../../erros/500Errors";
-import * as UserService from "../../services/auth/auth.services";
+import { loginSchema, signupSchema } from "../../validators/user.validator.js";
+import { ValidationError, AppError } from "../../erros/appError.js";
+import { InternalServerError } from "../../erros/500Errors.js";
+import * as UserService from "../../services/auth/auth.services.js";
 
 export const signup = async (req: Request, res: Response): Promise<void> => {
   try {

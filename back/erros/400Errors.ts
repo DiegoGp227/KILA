@@ -3,7 +3,7 @@
 // 4xx - ERRORES DEL CLIENTE
 // ============================================
 
-import { AppError } from "./appError";
+import { AppError } from "./appError.js";
 
 /**
  * 400 - Bad Request

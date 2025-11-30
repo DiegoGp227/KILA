@@ -3,7 +3,7 @@
 // ERRORES DE LÓGICA DE NEGOCIO
 // ============================================
 
-import { AppError } from "./appError";
+import { AppError } from "./appError.js";
 
 /**
  * Error de base de datos

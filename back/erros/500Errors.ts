@@ -3,7 +3,7 @@
 // 5xx - ERRORES DEL SERVIDOR
 // ============================================
 
-import { AppError } from "./appError";
+import { AppError } from "./appError.js";
 
 /**
  * 500 - Internal Server Error
