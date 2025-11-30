@@ -23,14 +23,16 @@ export default function LoginSecction() {
       <div className="w-full max-w-[480px] flex justify-center items-center">
         <div className="flex justify-center items-center flex-col gap-3">
           <Image src={kila} alt="Kila" width={100} height={100} />
-          <h1 className="text-3xl font-bold text-white mb-2 text-center">KILA</h1>
+          <h1 className="text-3xl font-bold text-white mb-2 text-center">
+            KILA
+          </h1>
           <p className="text-secondary-400 text-sm">
             Validador de Facturas DIAN
           </p>
         </div>
       </div>
 
-      <FormLogin onSubmit={handleLogin} />
+      <FormLogin onSubmit={handleLogin} isLoading={isLoading} error={error} />
     </div>
   );
 }

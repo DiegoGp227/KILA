@@ -11,7 +11,11 @@ interface FormLoginProps {
   error?: string | null;
 }
 
-export default function FormLogin({ onSubmit }: FormLoginProps) {
+export default function FormLogin({
+  onSubmit,
+  error,
+  isLoading,
+}: FormLoginProps) {
   const {
     register,
     handleSubmit,
@@ -33,9 +37,7 @@ export default function FormLogin({ onSubmit }: FormLoginProps) {
           {...register("email")}
         />
         {errors.email && (
-          <p className="text-red-500 text-sm mt-1">
-            {errors.email.message}
-          </p>
+          <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>
         )}
       </div>
 
@@ -50,11 +52,16 @@ export default function FormLogin({ onSubmit }: FormLoginProps) {
           <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>
         )}
       </div>
+      {error && (
+        <div className="w-full py-4 h-11 bg-red-400 border-2 border-red-600 flex justify-center items-center">
+          <p className="font-bold">{error}</p>
+        </div>
+      )}
 
       <button
         className="flex items-center justify-center gap-2 !bg-[#10b981] py-3 px-7 w-full text-white font-semibold hover:!bg-[#059669] transition-colors disabled:opacity-50"
         type="submit"
-        disabled={isSubmitting}
+        disabled={isSubmitting || isLoading}
       >
         <span>Iniciar Sesion</span>
         <LuSendHorizontal size={20} />
