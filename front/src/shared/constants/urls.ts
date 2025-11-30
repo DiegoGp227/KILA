@@ -15,3 +15,5 @@ export const TopicsURL = new URL("/api/topics", BaseURL);
 export const TasksURL = new URL("/api/tasks", BaseURL);
 
 export const UploadJsonURL = new URL("/api/upload", BaseURL);
+
+export const validationJson = new URL("/api/validation", BaseURL);
