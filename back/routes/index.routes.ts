@@ -5,8 +5,8 @@ import { login, signup } from "../controllers/auth/auth.controllers.js";
 export const router = Router();
 
 //Auth routes
-router.get("/api/signup", signup);
-router.get("/api/login", login);
+router.post("/api/signup", signup);
+router.post("/api/login", login);
 
 
 // Test routes
