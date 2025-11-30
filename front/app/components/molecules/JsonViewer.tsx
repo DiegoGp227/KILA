@@ -1,5 +1,7 @@
 "use client";
 
+import { ReactElement } from "react";
+
 interface FieldHighlight {
   field: string;
   severity: "error" | "warning";
@@ -38,8 +40,8 @@ export default function JsonViewer({
     return null;
   };
 
-  const formatJson = (obj: any, indent = 0, parentKey?: string): JSX.Element[] => {
-    const elements: JSX.Element[] = [];
+  const formatJson = (obj: any, indent = 0, parentKey?: string): ReactElement[] => {
+    const elements: ReactElement[] = [];
     const spaces = "  ".repeat(indent);
 
     if (typeof obj === "object" && obj !== null) {

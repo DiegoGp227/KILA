@@ -48,8 +48,8 @@ export default function ResultsPage() {
   const warnings = validation.warnings || [];
   const status = validation.status;
 
-  // Map status to MetricsPanel expected format
-  const metricsStatus: "success" | "error" | "warning" =
+  // Map status to expected format
+  const mappedStatus: "success" | "error" | "warning" =
     status === "approved" ? "success" :
     status === "rejected" ? "error" :
     "warning";
@@ -80,7 +80,7 @@ export default function ResultsPage() {
 
       {/* Metrics Panel (Floating) */}
       <MetricsPanel
-        status={metricsStatus}
+        status={mappedStatus}
         errors={errors.length}
         warnings={warnings.length}
         passed={passed}
@@ -169,7 +169,7 @@ export default function ResultsPage() {
 
           {/* Summary Card */}
           <SummaryCard
-            status={status}
+            status={mappedStatus}
             title={status === "rejected" ? "No Cumple" : status === "warning" ? "Con Advertencias" : "Cumple"}
             description={
               status === "rejected"

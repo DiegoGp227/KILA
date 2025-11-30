@@ -11,7 +11,7 @@ export interface StoredValidation {
     field: string;
     message: string;
     section: string;
-    severity: "error";
+    severity: "error" | "warning";
     requirementNumber?: number;
     allowsPartialCompliance?: boolean;
   }>;
@@ -19,7 +19,7 @@ export interface StoredValidation {
     field: string;
     message: string;
     section: string;
-    severity: "warning";
+    severity: "error" | "warning";
     requirementNumber?: number;
     allowsPartialCompliance?: boolean;
   }>;

@@ -12,6 +12,7 @@ export interface ValidationError {
   severity: "error" | "warning";
   requirementNumber?: number; // 1-11 según las reglas DIAN
   allowsPartialCompliance?: boolean;
+  source?: "frontend" | "backend" | "merged";
 }
 
 export interface ValidationResult {
