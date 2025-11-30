@@ -1,19 +1,24 @@
-"use client";
+"use client"
 
-import { useState } from "react";
+import FormLogin from "@/src/login/forms/FormLogin";
+import useAuthUser from "@/src/login/services/hooks/useAuthUser";
+import { LoginInput } from "@/src/validators/user.validator";
 import { useRouter } from "next/navigation";
-import { useTranslation } from "../i18n/LanguageContext";
 
 export default function LoginPage() {
+  const { login: loginUser, isLoading, error } = useAuthUser();
   const router = useRouter();
-  const t = useTranslation();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
 
-  const handleLogin = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Simple redirect to dashboard without authentication
-    router.push("/dashboard");
+
+ const handleLogin = async (data: LoginInput) => {
+
+    const response = await loginUser(data);
+    if (response) {
+      console.log("Usuario registrado/logueado:", response);
+      router.push("/");
+    } else {
+      console.error("Error al registrar/loguear usuario:", error);
+    }
   };
 
   return (
@@ -33,7 +38,8 @@ export default function LoginPage() {
           alignItems: "center",
           justifyContent: "center",
           padding: "3rem",
-          background: "linear-gradient(135deg, var(--primary-600) 0%, var(--primary-500) 100%)",
+          background:
+            "linear-gradient(135deg, var(--primary-600) 0%, var(--primary-500) 100%)",
           position: "relative",
           overflow: "hidden",
         }}
@@ -133,10 +139,21 @@ export default function LoginPage() {
                 ✓
               </div>
               <div>
-                <h3 style={{ color: "white", fontWeight: "600", marginBottom: "0.25rem" }}>
+                <h3
+                  style={{
+                    color: "white",
+                    fontWeight: "600",
+                    marginBottom: "0.25rem",
+                  }}
+                >
                   Validación Automática
                 </h3>
-                <p style={{ color: "rgba(255, 255, 255, 0.8)", fontSize: "0.875rem" }}>
+                <p
+                  style={{
+                    color: "rgba(255, 255, 255, 0.8)",
+                    fontSize: "0.875rem",
+                  }}
+                >
                   Según normativa DIAN CT-COA-0124
                 </p>
               </div>
@@ -158,10 +175,21 @@ export default function LoginPage() {
                 📊
               </div>
               <div>
-                <h3 style={{ color: "white", fontWeight: "600", marginBottom: "0.25rem" }}>
+                <h3
+                  style={{
+                    color: "white",
+                    fontWeight: "600",
+                    marginBottom: "0.25rem",
+                  }}
+                >
                   Reportes Detallados
                 </h3>
-                <p style={{ color: "rgba(255, 255, 255, 0.8)", fontSize: "0.875rem" }}>
+                <p
+                  style={{
+                    color: "rgba(255, 255, 255, 0.8)",
+                    fontSize: "0.875rem",
+                  }}
+                >
                   Análisis completo de errores y advertencias
                 </p>
               </div>
@@ -183,10 +211,21 @@ export default function LoginPage() {
                 ⚡
               </div>
               <div>
-                <h3 style={{ color: "white", fontWeight: "600", marginBottom: "0.25rem" }}>
+                <h3
+                  style={{
+                    color: "white",
+                    fontWeight: "600",
+                    marginBottom: "0.25rem",
+                  }}
+                >
                   Resultados Rápidos
                 </h3>
-                <p style={{ color: "rgba(255, 255, 255, 0.8)", fontSize: "0.875rem" }}>
+                <p
+                  style={{
+                    color: "rgba(255, 255, 255, 0.8)",
+                    fontSize: "0.875rem",
+                  }}
+                >
                   Validación en 10-30 segundos
                 </p>
               </div>
@@ -211,215 +250,58 @@ export default function LoginPage() {
             maxWidth: "480px",
           }}
         >
-        {/* Logo */}
-        <div style={{ textAlign: "center", marginBottom: "2rem" }}>
-          <div
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              justifyContent: "center",
-              width: "64px",
-              height: "64px",
-              borderRadius: "16px",
-              background: "linear-gradient(135deg, var(--primary-500) 0%, var(--primary-600) 100%)",
-              fontSize: "2rem",
-              fontWeight: "bold",
-              color: "white",
-              marginBottom: "1rem",
-            }}
-          >
-            K
-          </div>
-          <h1
-            style={{
-              fontSize: "1.75rem",
-              fontWeight: "bold",
-              color: "white",
-              marginBottom: "0.5rem",
-            }}
-          >
-            KILA
-          </h1>
-          <p className="text-secondary-400" style={{ fontSize: "0.875rem" }}>
-            Validador de Facturas DIAN
-          </p>
-        </div>
-
-        {/* Form */}
-        <form onSubmit={handleLogin}>
-          {/* Email */}
-          <div style={{ marginBottom: "1.5rem" }}>
-            <label
-              htmlFor="email"
+          {/* Logo */}
+          <div style={{ textAlign: "center", marginBottom: "2rem" }}>
+            <div
               style={{
-                display: "block",
-                fontSize: "0.875rem",
-                fontWeight: "500",
-                color: "var(--secondary-300)",
-                marginBottom: "0.5rem",
-              }}
-            >
-              Correo Electrónico
-            </label>
-            <input
-              type="email"
-              id="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="tu@email.com"
-              style={{
-                width: "100%",
-                padding: "0.75rem 1rem",
-                backgroundColor: "var(--bg-secondary)",
-                border: "1px solid var(--border-color)",
-                borderRadius: "var(--border-radius)",
-                color: "white",
-                fontSize: "0.875rem",
-                outline: "none",
-                transition: "border-color 0.2s",
-              }}
-              onFocus={(e) => {
-                e.target.style.borderColor = "var(--primary-500)";
-              }}
-              onBlur={(e) => {
-                e.target.style.borderColor = "var(--border-color)";
-              }}
-            />
-          </div>
-
-          {/* Password */}
-          <div style={{ marginBottom: "1.5rem" }}>
-            <label
-              htmlFor="password"
-              style={{
-                display: "block",
-                fontSize: "0.875rem",
-                fontWeight: "500",
-                color: "var(--secondary-300)",
-                marginBottom: "0.5rem",
-              }}
-            >
-              Contraseña
-            </label>
-            <input
-              type="password"
-              id="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="••••••••"
-              style={{
-                width: "100%",
-                padding: "0.75rem 1rem",
-                backgroundColor: "var(--bg-secondary)",
-                border: "1px solid var(--border-color)",
-                borderRadius: "var(--border-radius)",
-                color: "white",
-                fontSize: "0.875rem",
-                outline: "none",
-                transition: "border-color 0.2s",
-              }}
-              onFocus={(e) => {
-                e.target.style.borderColor = "var(--primary-500)";
-              }}
-              onBlur={(e) => {
-                e.target.style.borderColor = "var(--border-color)";
-              }}
-            />
-          </div>
-
-          {/* Remember & Forgot */}
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              marginBottom: "1.5rem",
-            }}
-          >
-            <label
-              style={{
-                display: "flex",
+                display: "inline-flex",
                 alignItems: "center",
-                gap: "0.5rem",
-                fontSize: "0.875rem",
-                color: "var(--secondary-300)",
-                cursor: "pointer",
+                justifyContent: "center",
+                width: "64px",
+                height: "64px",
+                borderRadius: "16px",
+                background:
+                  "linear-gradient(135deg, var(--primary-500) 0%, var(--primary-600) 100%)",
+                fontSize: "2rem",
+                fontWeight: "bold",
+                color: "white",
+                marginBottom: "1rem",
               }}
             >
-              <input
-                type="checkbox"
-                style={{
-                  width: "16px",
-                  height: "16px",
-                  cursor: "pointer",
-                }}
-              />
-              Recordarme
-            </label>
-            <a
-              href="#"
+              K
+            </div>
+            <h1
               style={{
-                fontSize: "0.875rem",
-                color: "var(--primary-500)",
-                textDecoration: "none",
-              }}
-              onMouseOver={(e) => {
-                e.currentTarget.style.textDecoration = "underline";
-              }}
-              onMouseOut={(e) => {
-                e.currentTarget.style.textDecoration = "none";
+                fontSize: "1.75rem",
+                fontWeight: "bold",
+                color: "white",
+                marginBottom: "0.5rem",
               }}
             >
-              ¿Olvidaste tu contraseña?
-            </a>
+              KILA
+            </h1>
+            <p className="text-secondary-400" style={{ fontSize: "0.875rem" }}>
+              Validador de Facturas DIAN
+            </p>
           </div>
 
-          {/* Login Button */}
-          <button
-            type="submit"
-            className="btn btn-primary"
-            style={{
-              width: "100%",
-              padding: "0.875rem",
-              fontSize: "1rem",
-              fontWeight: "600",
-            }}
-          >
-            Iniciar Sesión
-          </button>
-        </form>
+          {/* Form */}
 
-        {/* Sign Up Link */}
-        <p
-          style={{
-            textAlign: "center",
-            marginTop: "1.5rem",
-            fontSize: "0.875rem",
-            color: "var(--secondary-400)",
-          }}
-        >
-          ¿No tienes una cuenta?{" "}
-          <a
-            href="#"
-            onClick={(e) => {
-              e.preventDefault();
-              router.push("/dashboard");
-            }}
-            style={{
-              color: "var(--primary-500)",
-              textDecoration: "none",
-              fontWeight: "600",
-            }}
-            onMouseOver={(e) => {
-              e.currentTarget.style.textDecoration = "underline";
-            }}
-            onMouseOut={(e) => {
-              e.currentTarget.style.textDecoration = "none";
-            }}
-          >
-            Regístrate
-          </a>
-        </p>
+          <FormLogin onSubmit={handleLogin}  />
+
+          {/* Login Button
+            <button
+              type="submit"
+              className="btn btn-primary"
+              style={{
+                width: "100%",
+                padding: "0.875rem",
+                fontSize: "1rem",
+                fontWeight: "600",
+              }}
+            >
+              Iniciar Sesión
+            </button> */}
         </div>
       </div>
     </div>
