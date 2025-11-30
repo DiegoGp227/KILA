@@ -1,9 +1,11 @@
-import bcrypt from 'bcryptjs';
-import prisma from '../../db/prisma.js';
-import { ICreateUserDTO, IUserResponse } from '../../types/user.types';
-import { EmailAlreadyInUseError } from '../../erros/businessErrors';
+import bcrypt from "bcryptjs";
+import prisma from "../../db/prisma.js";
+import { ICreateUser, ILoginUser, IUserResponse } from "../../types/user.types";
+import { EmailAlreadyInUseError, InvalidCredentialsError } from "../../erros/businessErrors";
 
-export const createUser = async (userData: ICreateUserDTO): Promise<IUserResponse> => {
+export const createUser = async (
+  userData: ICreateUser
+): Promise<IUserResponse> => {
   const existingUser = await prisma.user.findUnique({
     where: { email: userData.email },
   });
@@ -34,4 +36,34 @@ export const createUser = async (userData: ICreateUserDTO): Promise<IUserRespons
 
 export const findUserByEmail = async (email: string) => {
   return prisma.user.findUnique({ where: { email } });
+};
+
+export const loginuser = async (
+  userData: ILoginUser
+): Promise<IUserResponse> => {
+
+  const existingUser = await prisma.user.findUnique({
+    where: { email: userData.email },
+  });
+
+  if (!existingUser) {
+    throw new InvalidCredentialsError(userData.email);
+  }
+
+  const isPasswordValid = await bcrypt.compare(
+    userData.password,
+    existingUser.passwordHash
+  );
+
+  if (!isPasswordValid) {
+    throw new InvalidCredentialsError(userData.email);
+  }
+
+  return {
+    id: existingUser.id,
+    username: existingUser.username,
+    email: existingUser.email,
+    createdAt: existingUser.createdAt,
+    updatedAt: existingUser.updatedAt,
+  };
 };
