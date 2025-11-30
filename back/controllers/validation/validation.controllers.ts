@@ -14,10 +14,6 @@ interface MulterRequest extends Request {
   };
 }
 
-/**
- * Controller para validar JSON de facturas según normativa DIAN CT-COA-0124
- * Valida las 11 reglas obligatorias de facturas de importación
- */
 export const validationJson = async (
   req: MulterRequest,
   res: Response

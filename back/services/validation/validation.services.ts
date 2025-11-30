@@ -1,6 +1,9 @@
 import { validateDIANInvoice } from "../../utils/dianValidator.js";
 import prisma from "../../db/prisma.js";
-import { BadRequestError, PayloadTooLargeError } from "../../erros/400Errors.js";
+import {
+  BadRequestError,
+  PayloadTooLargeError,
+} from "../../erros/400Errors.js";
 
 interface MulterFile {
   fieldname: string;
@@ -46,7 +49,7 @@ export const validateInvoiceJson = async (
     });
   }
 
-  const MAX_SIZE = 10 * 1024 * 1024;
+  const MAX_SIZE = 10 * 1024 * 1024; // 10 MB
   if (file.size > MAX_SIZE) {
     throw new PayloadTooLargeError(
       `El archivo JSON supera el límite de 10MB. Tamaño: ${file.size} bytes, Máximo: ${MAX_SIZE} bytes`
@@ -69,10 +72,8 @@ export const validateInvoiceJson = async (
   const saved = await prisma.invoiceValidation.create({
     data: {
       invoiceId:
-        jsonContent?.invoice_number ||
-        jsonContent?.invoiceNumber ||
-        "UNKNOWN",
-      userId: userId,
+        jsonContent?.invoice_number || jsonContent?.invoiceNumber || "UNKNOWN",
+      userId: userId ?? null,
       passed: validation.isValid,
       errors: JSON.parse(JSON.stringify(validation.errors)),
       warnings: JSON.parse(JSON.stringify(validation.warnings)),
