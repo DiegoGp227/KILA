@@ -69,5 +69,5 @@ Thumbs.db
 # ======================
 *.bak
 *.orig
-mysql_data/
+postgres_data/
 *.local
