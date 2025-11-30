@@ -3,23 +3,13 @@ import * as ValidationService from "../../services/validation/validation.service
 import { AppError } from "../../erros/appError.js";
 import { InternalServerError } from "../../erros/500Errors.js";
 
-interface MulterRequest extends Request {
-  file?: {
-    fieldname: string;
-    originalname: string;
-    encoding: string;
-    mimetype: string;
-    size: number;
-    buffer: Buffer;
-  };
-}
-
 export const validationJson = async (
-  req: MulterRequest,
+  req: Request,
   res: Response
 ): Promise<void> => {
   try {
-    const userId = req.user?.id;
+    const rawUserId = req.user?.id;
+    const userId = rawUserId ? Number(rawUserId) : undefined;
 
     const result = await ValidationService.validateInvoiceJson(
       req.file!,
