@@ -1,5 +1,4 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
+// Prisma Schema — English standardized
 
 generator client {
   provider = "prisma-client-js"
@@ -10,32 +9,34 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Usuario {
-  id                   Int                    @id @default(autoincrement())
-  email                String                 @unique @db.VarChar(255)
-  passwordHash         String                 @map("password_hash") @db.VarChar(255)
-  createdAt            DateTime               @default(now()) @map("created_at")
-  updatedAt            DateTime               @default(now()) @updatedAt @map("updated_at")
-  validacionesFacturas ValidacionFactura[]
+model User {
+  id              Int      @id @default(autoincrement())
+  username        String   @db.VarChar(100)
+  email           String   @unique @db.VarChar(255)
+  passwordHash    String   @map("password_hash") @db.VarChar(255)
+  currency        String   @default("USD") @db.VarChar(10)
+  budgetResetDay  Int      @default(1) @map("budget_reset_day")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @default(now()) @updatedAt @map("updated_at")
 
-  @@map("usuarios")
+  invoiceValidations InvoiceValidation[]
+
+  @@map("users")
 }
 
-model ValidacionFactura {
-  id               Int      @id @default(autoincrement())
-  facturaId        String   @map("factura_id") @db.VarChar(100)
-  usuarioId        Int?     @map("usuario_id")
-  fechaValidacion  DateTime @default(now()) @map("fecha_validacion")
-  paso             Boolean
-  errores          Json     @default("[]")
-  advertencias     Json     @default("[]")
-  datosFactura     Json?    @map("datos_factura")
+model InvoiceValidation {
+  id             Int      @id @default(autoincrement())
+  invoiceId      String   @map("invoice_id") @db.VarChar(100)
+  userId         Int?     @map("user_id")
+  validationDate DateTime @default(now()) @map("validation_date")
+  passed         Boolean
+  errors         Json     @default("[]")
+  warnings       Json     @default("[]")
+  invoiceData    Json     @map("invoice_data") // Quité el ? porque dijiste que necesitas guardar el JSON
 
-  usuario          Usuario? @relation(fields: [usuarioId], references: [id], onDelete: SetNull)
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
 
-  @@index([facturaId], map: "idx_validaciones_factura_id")
-  @@index([fechaValidacion(sort: Desc)], map: "idx_validaciones_fecha")
-  @@index([usuarioId], map: "idx_validaciones_usuario")
-  @@index([paso], map: "idx_validaciones_paso")
-  @@map("validaciones_facturas")
+  @@index([invoiceId])
+  @@index([validationDate(sort: Desc)])
+  @@map("invoice_validations")
 }

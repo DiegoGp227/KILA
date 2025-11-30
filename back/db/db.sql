@@ -1,30 +1,28 @@
--- Tabla de usuarios (login)
-CREATE TABLE usuarios (
+CREATE TABLE users (
     id SERIAL PRIMARY KEY,
     email VARCHAR(255) UNIQUE NOT NULL,
-    password_hash VARCHAR(255) NOT NULL, -- NUNCA guardes passwords en texto plano
+    password_hash VARCHAR(255) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Tabla de validaciones de facturas
-CREATE TABLE validaciones_facturas (
+CREATE TABLE invoice_validations (
     id SERIAL PRIMARY KEY,
-    factura_id VARCHAR(100) NOT NULL, -- el ID que identifica la factura
-    usuario_id INTEGER REFERENCES usuarios(id) ON DELETE SET NULL,
-    fecha_validacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    paso BOOLEAN NOT NULL,
-    errores JSONB DEFAULT '[]'::jsonb,
-    advertencias JSONB DEFAULT '[]'::jsonb,
-    datos_factura JSONB, -- opcional: si quieres guardar snapshot de la factura validada
+    invoice_id VARCHAR(100) NOT NULL,
+    user_id INTEGER REFERENCES users(id) ON DELETE SET NULL,
+    validation_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    passed BOOLEAN NOT NULL,
+    errors JSONB DEFAULT '[]'::jsonb,
+    warnings JSONB DEFAULT '[]'::jsonb,
+    invoice_data JSONB NOT NULL,
     
-    CONSTRAINT validaciones_facturas_pkey PRIMARY KEY (id)
+    CONSTRAINT invoice_validations_pkey PRIMARY KEY (id)
 );
 
--- Índices
-CREATE INDEX idx_validaciones_factura_id ON validaciones_facturas(factura_id);
-CREATE INDEX idx_validaciones_fecha ON validaciones_facturas(fecha_validacion DESC);
-CREATE INDEX idx_validaciones_usuario ON validaciones_facturas(usuario_id);
-CREATE INDEX idx_validaciones_paso ON validaciones_facturas(paso);
-CREATE INDEX idx_errores_gin ON validaciones_facturas USING GIN (errores);
-CREATE INDEX idx_advertencias_gin ON validaciones_facturas USING GIN (advertencias);
+CREATE INDEX idx_invoice_id ON invoice_validations(invoice_id);
+CREATE INDEX idx_validation_date ON invoice_validations(validation_date DESC);
+CREATE INDEX idx_user_id ON invoice_validations(user_id);
+CREATE INDEX idx_passed ON invoice_validations(passed);
+CREATE INDEX idx_errors_gin ON invoice_validations USING GIN (errors);
+CREATE INDEX idx_warnings_gin ON invoice_validations USING GIN (warnings);
+CREATE INDEX idx_invoice_data_gin ON invoice_validations USING GIN (invoice_data);
