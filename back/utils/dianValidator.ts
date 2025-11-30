@@ -1,9 +1,7 @@
 /**
- * DIAN Invoice Validation Service
+ * DIAN Invoice Validation Service - Backend
  * Validates import invoices according to DIAN regulations (CT-COA-0124)
  */
-
-import { adaptInvoiceToNormalizedFormat, OriginalInvoiceFormat } from "./invoice.adapter";
 
 export interface ValidationError {
   field: string;
@@ -18,7 +16,7 @@ export interface ValidationResult {
   isValid: boolean;
   errors: ValidationError[];
   warnings: ValidationError[];
-  source: "frontend" | "backend" | "merged";
+  source: "backend";
 }
 
 // Valid Incoterms according to ICC
@@ -29,58 +27,49 @@ const VALID_CURRENCIES = ["USD", "EUR", "COP", "GBP", "JPY", "CNY", "CAD", "AUD"
 
 /**
  * Main validation function for DIAN invoice requirements
- * Automatically detects and adapts the invoice format
  */
 export function validateDIANInvoice(invoiceData: any): ValidationResult {
   const errors: ValidationError[] = [];
   const warnings: ValidationError[] = [];
 
-  // Auto-detect format and normalize
-  let normalizedData = invoiceData;
-
-  // Check if it's the Fields/Table format
-  if (invoiceData.Fields && Array.isArray(invoiceData.Fields) && invoiceData.Table) {
-    normalizedData = adaptInvoiceToNormalizedFormat(invoiceData as OriginalInvoiceFormat);
-  }
-
   // 1. Número de factura (OBLIGATORIO - No permite cumplimiento parcial)
-  validateInvoiceNumber(normalizedData, errors);
+  validateInvoiceNumber(invoiceData, errors);
 
   // 2. Fecha de expedición (OBLIGATORIO - Permite cumplimiento parcial)
-  validateIssueDate(normalizedData, errors, warnings);
+  validateIssueDate(invoiceData, errors, warnings);
 
   // 3. Lugar de expedición (OBLIGATORIO - Permite cumplimiento parcial)
-  validateIssuePlace(normalizedData, errors, warnings);
+  validateIssuePlace(invoiceData, errors, warnings);
 
   // 4. Nombre y dirección del vendedor (OBLIGATORIO - Permite cumplimiento parcial)
-  validateSupplierInfo(normalizedData, errors, warnings);
+  validateSupplierInfo(invoiceData, errors, warnings);
 
   // 5. Nombre y dirección del comprador (OBLIGATORIO - Permite cumplimiento parcial)
-  validateCustomerInfo(normalizedData, errors, warnings);
+  validateCustomerInfo(invoiceData, errors, warnings);
 
   // 6. Descripción detallada de la mercancía (OBLIGATORIO - Permite cumplimiento parcial)
-  validateItemDescriptions(normalizedData, errors, warnings);
+  validateItemDescriptions(invoiceData, errors, warnings);
 
   // 7. Cantidad de unidades (OBLIGATORIO - Permite cumplimiento parcial)
-  validateQuantities(normalizedData, errors, warnings);
+  validateQuantities(invoiceData, errors, warnings);
 
   // 8. Precio unitario y total (OBLIGATORIO - Permite cumplimiento parcial)
-  validatePrices(normalizedData, errors, warnings);
+  validatePrices(invoiceData, errors, warnings);
 
   // 9. Moneda de la transacción (OBLIGATORIO - No permite cumplimiento parcial)
-  validateCurrency(normalizedData, errors);
+  validateCurrency(invoiceData, errors);
 
   // 10. Condiciones de entrega - Incoterm (OBLIGATORIO - No permite cumplimiento parcial)
-  validateIncoterm(normalizedData, errors);
+  validateIncoterm(invoiceData, errors);
 
   // 11. Forma de pago (OBLIGATORIO - Permite cumplimiento parcial)
-  validatePaymentMethod(normalizedData, errors, warnings);
+  validatePaymentMethod(invoiceData, errors, warnings);
 
   return {
     isValid: errors.length === 0,
     errors,
     warnings,
-    source: "frontend",
+    source: "backend",
   };
 }
 
@@ -423,10 +412,6 @@ function validateQuantities(data: any, errors: ValidationError[], warnings: Vali
   });
 }
 
-/**
- * 8. Validate prices (unit and total)
- * ✅ Permite cumplimiento parcial (si solo uno está presente)
- */
 function validatePrices(data: any, errors: ValidationError[], warnings: ValidationError[]) {
   const items = data?.items || data?.line_items || data?.products || [];
 

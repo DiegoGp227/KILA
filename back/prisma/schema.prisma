@@ -32,7 +32,7 @@ model InvoiceValidation {
   passed         Boolean
   errors         Json     @default("[]")
   warnings       Json     @default("[]")
-  invoiceData    Json     @map("invoice_data") // Quité el ? porque dijiste que necesitas guardar el JSON
+  invoiceData    Json     @map("invoice_data") 
 
   user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
 

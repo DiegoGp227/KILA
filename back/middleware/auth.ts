@@ -1,6 +1,7 @@
 // middleware/auth.middleware.ts
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
+import { UnauthorizedError, InvalidTokenError } from '../erros/400Errors.js';
 
 declare global {
   namespace Express {
@@ -16,11 +17,10 @@ declare global {
 
 export const authMiddleware = (req: Request, res: Response, next: NextFunction): void => {
   try {
-    const token = req.headers.authorization?.split(' ')[1]; // "Bearer TOKEN"
+    const token = req.headers.authorization?.split(' ')[1];
 
     if (!token) {
-      res.status(401).json({ error: 'Token not provided' });
-      return;
+      throw new UnauthorizedError('Token not provided');
     }
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET!) as { userId: number; email: string };
@@ -32,6 +32,12 @@ export const authMiddleware = (req: Request, res: Response, next: NextFunction):
 
     next();
   } catch (error) {
-    res.status(401).json({ error: 'Invalid token' });
+    if (error instanceof jwt.JsonWebTokenError) {
+      next(new InvalidTokenError('Invalid or malformed token'));
+    } else if (error instanceof jwt.TokenExpiredError) {
+      next(new InvalidTokenError('Token has expired'));
+    } else {
+      next(error);
+    }
   }
 };

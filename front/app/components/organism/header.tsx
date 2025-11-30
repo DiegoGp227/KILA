@@ -13,10 +13,8 @@ function Header() {
 
   const hiddenRoutes = ["/sign_up", "/login", "/not-found", "/"];
 
-  // Verificamos si coincide exactamente con alguna
   const hideHeader = hiddenRoutes.includes(pathname);
 
-  // Inicializar tema desde localStorage
   useEffect(() => {
     const savedTheme = localStorage.getItem("theme");
     const prefersDark = window.matchMedia(
@@ -32,7 +30,6 @@ function Header() {
     }
   }, []);
 
-  // Cambiar tema
   const toggleTheme = () => {
     if (isDarkMode) {
       document.documentElement.classList.remove("dark");
@@ -45,7 +42,6 @@ function Header() {
     }
   };
 
-  // Cerrar dropdown al hacer clic fuera
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
