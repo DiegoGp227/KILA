@@ -8,8 +8,7 @@ export const validationJson = async (
   res: Response
 ): Promise<void> => {
   try {
-    const rawUserId = req.user?.id;
-    const userId = rawUserId ? Number(rawUserId) : undefined;
+    const userId = req.user?.id;
 
     const result = await ValidationService.validateInvoiceJson(
       req.file!,
