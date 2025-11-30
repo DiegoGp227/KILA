@@ -52,8 +52,7 @@ export default function FormLogin({ onSubmit }: FormLoginProps) {
       </div>
 
       <button
-
-        className="flex items-center justify-center gap-2 bg-[#10b981] pt-6 px-7"
+        className="flex items-center justify-center gap-2 !bg-[#10b981] py-3 px-7 w-full text-white font-semibold hover:!bg-[#059669] transition-colors disabled:opacity-50"
         type="submit"
         disabled={isSubmitting}
       >
