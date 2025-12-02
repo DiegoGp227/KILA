@@ -56,8 +56,8 @@ export default function UploadSistem() {
       const response = await validateFile(file);
 
       if (response?.success && response.data) {
-        router.push(`/validation/processing?id=${response.data.savedRecord.id}`);
-
+        // Redirigir a la página de procesamiento con el ID de la validación guardada
+        router.push(`/validation/processing/${response.data.savedRecord.id}`);
       } else {
         setError(response?.error || "Error al procesar la validación");
       }

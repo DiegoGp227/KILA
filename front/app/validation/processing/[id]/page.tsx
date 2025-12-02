@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
 import StepsSistem from "@/app/components/organism/StepsSistem";
 import ProcessingSpinner from "@/app/components/atoms/ProcessingSpinner";
 import ProgressBar from "@/app/components/atoms/ProgressBar";
@@ -54,12 +54,12 @@ const validationSteps = [
 
 export default function ProcessingPage() {
   const router = useRouter();
-  const searchParams = useSearchParams();
+  const params = useParams();
   const [currentStep, setCurrentStep] = useState(0);
   const [progress, setProgress] = useState(0);
 
-  const validationId = searchParams.get("id"); 
-  
+  const validationId = params.id as string;
+
   useEffect(() => {
     if (!validationId) {
       router.push("/validation/home");

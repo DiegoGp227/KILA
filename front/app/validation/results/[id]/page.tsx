@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo, useEffect } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
 import StepsSistem from "@/app/components/organism/StepsSistem";
 import MetricsPanel from "@/app/components/organism/MetricsPanel";
 import SummaryCard from "@/app/components/molecules/SummaryCard";
@@ -11,27 +11,65 @@ import { getValidationById, StoredValidation } from "@/app/services/localStorage
 
 export default function ResultsPage() {
   const router = useRouter();
-  const searchParams = useSearchParams();
+  const params = useParams();
   const [showSuccess, setShowSuccess] = useState(false);
   const [validation, setValidation] = useState<StoredValidation | null>(null);
 
-  const validationId = searchParams.get("id");
-  const filename = searchParams.get("filename") || "factura.json";
+  const validationId = params.id as string;
+  const filename = "factura.json";
 
   useEffect(() => {
-    // Load validation from localStorage
+    // Load validation from backend
     if (!validationId) {
-      router.push("/validation/home");
       return;
     }
 
-    const storedValidation = getValidationById(validationId);
-    if (!storedValidation) {
-      router.push("/validation/home");
-      return;
-    }
+    const fetchValidation = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const baseUrl = process.env.NEXT_PUBLIC_API_URL || "https://api-kila.devdiego.work";
 
-    setValidation(storedValidation);
+        const response = await fetch(`${baseUrl}/api/validation/${validationId}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (!response.ok) {
+          console.error("Error fetching validation:", response.status);
+          return;
+        }
+
+        const data = await response.json();
+
+        // Transform backend response to StoredValidation format
+        const transformedValidation: StoredValidation = {
+          id: String(data.id),
+          filename: data.filename || "factura.json",
+          timestamp: data.validation_date,
+          invoice_data: data.invoice_data,
+          errors: data.errors || [],
+          warnings: data.warnings || [],
+          status: data.passed ? "approved" : (data.warning_count > 0 ? "warning" : "rejected"),
+          invoice_info: {
+            invoice_number: data.invoice_id || "",
+            supplier: "",
+            customer: "",
+            total_amount: "",
+            currency: "",
+            date: "",
+            items_count: 0,
+          },
+          validation_source: "backend",
+        };
+
+        setValidation(transformedValidation);
+      } catch (error) {
+        console.error("Error loading validation:", error);
+      }
+    };
+
+    fetchValidation();
   }, [validationId, router]);
 
   if (!validation) {
