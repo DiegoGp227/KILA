@@ -6,12 +6,10 @@ import useValidateDIAN from "@/src/home/services/useValidateDIAN";
 
 export default function UploadSistem() {
   const [dragActive, setDragActive] = useState(false);
-  const [uploading, setUploading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
 
-  const { validateFile, isLoading, error: validationError } = useValidateDIAN();
+  const { validateFile, isLoading, error } = useValidateDIAN();
 
   const handleDrag = (e: React.DragEvent) => {
     e.preventDefault();
@@ -34,35 +32,24 @@ export default function UploadSistem() {
   };
 
   const handleFile = async (file: File) => {
-    setError(null);
-
+    // Validaciones locales: tipo y tamaño
     if (file.type !== "application/json" && !file.name.endsWith(".json")) {
-      setError("Por favor, selecciona un archivo JSON válido");
-      return;
+      return alert("Por favor, selecciona un archivo JSON válido");
     }
 
     if (file.size > REQUEST_CONFIG.maxFileSize) {
-      setError(
+      return alert(
         `El archivo es demasiado grande. Máximo ${
           REQUEST_CONFIG.maxFileSize / 1024 / 1024
         }MB`
       );
-      return;
     }
 
-    setUploading(true);
+    // Llamada al hook
+    const response = await validateFile(file);
 
-    try {
-      const response = await validateFile(file);
-
-      if (response?.success && response.data) {
-        // Redirigir a la página de procesamiento con el ID de la validación guardada
-        router.push(`/validation/processing/${response.data.savedRecord.id}`);
-      } else {
-        setError(response?.error || "Error al procesar la validación");
-      }
-    } catch {
-      setError("Error al conectar con el servidor");
+    if (response.success && response.data) {
+      router.push(`/validation/processing/${response.data.savedRecord.id}`);
     }
   };
 
@@ -73,31 +60,27 @@ export default function UploadSistem() {
         onDragLeave={handleDrag}
         onDragOver={handleDrag}
         onDrop={handleDrop}
-        onClick={() => !uploading && fileInputRef.current?.click()}
+        onClick={() => !isLoading && fileInputRef.current?.click()}
         id="uploadZone"
         className={`
           upload-zone
           ${dragActive ? "dragover" : ""}
-          ${uploading ? "opacity-50" : ""}
+          ${isLoading ? "opacity-50 cursor-not-allowed" : ""}
           flex flex-col items-center justify-center text-center
           p-6 rounded-xl border border-dashed border-secondary-400
-          bg-secondary-900 cursor-pointer transition
+          bg-secondary-900 transition
         `}
       >
         <div className="upload-icon text-4xl mb-3">
-          {uploading ? "⏳" : "📄"}
+          {isLoading ? "⏳" : "📄"}
         </div>
 
         <h3 className="text-white mb-2 text-lg font-semibold">
-          {uploading
-            ? "Procesando archivo..."
-            : "Arrastra tu archivo JSON aquí"}
+          {isLoading ? "Procesando archivo..." : "Arrastra tu archivo JSON aquí"}
         </h3>
 
         <p className="text-muted mb-6">
-          {uploading
-            ? "Validando con DIAN..."
-            : "o haz clic para seleccionar un archivo"}
+          {isLoading ? "Validando con DIAN..." : "o haz clic para seleccionar un archivo"}
         </p>
 
         <input
@@ -106,20 +89,20 @@ export default function UploadSistem() {
           accept=".json"
           onChange={handleChange}
           className="hidden"
-          disabled={uploading}
+          disabled={isLoading}
         />
 
         <button
           className={`btn btn-primary px-4 py-2 rounded-lg text-white transition ${
-            uploading ? "opacity-75 cursor-not-allowed" : ""
+            isLoading ? "opacity-75 cursor-not-allowed" : ""
           }`}
           onClick={(e) => {
             e.stopPropagation();
             fileInputRef.current?.click();
           }}
-          disabled={uploading}
+          disabled={isLoading}
         >
-          {uploading ? "Procesando..." : "Seleccionar Archivo"}
+          {isLoading ? "Procesando..." : "Seleccionar Archivo"}
         </button>
 
         <p className="text-muted text-xs mt-4">
@@ -129,12 +112,7 @@ export default function UploadSistem() {
       </div>
 
       {error && (
-        <div
-          className="
-            mt-4 p-4 rounded-lg border border-red-400/40
-            bg-red-500/10 text-red-400 text-sm
-          "
-        >
+        <div className="mt-4 p-4 rounded-lg border border-red-400/40 bg-red-500/10 text-red-400 text-sm">
           <strong>⚠️ Error:</strong> {error}
         </div>
       )}
