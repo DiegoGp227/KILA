@@ -8,13 +8,48 @@ import ProgressBar from "@/app/components/atoms/ProgressBar";
 import ValidationStep from "@/app/components/molecules/ValidationStep";
 
 const validationSteps = [
-  { id: 1, title: "Estructura del archivo JSON", duration: 800, validates: "JSON format" },
-  { id: 2, title: "Datos del proveedor", duration: 1200, validates: "supplier fields" },
-  { id: 3, title: "Datos del importador", duration: 1200, validates: "customer fields" },
-  { id: 4, title: "Información de factura", duration: 1000, validates: "invoice fields" },
-  { id: 5, title: "Detalle de items", duration: 1500, validates: "items validation" },
-  { id: 6, title: "Información de transporte", duration: 800, validates: "transport fields" },
-  { id: 7, title: "Validaciones numéricas", duration: 1000, validates: "numeric validations" },
+  {
+    id: 1,
+    title: "Estructura del archivo JSON",
+    duration: 800,
+    validates: "JSON format",
+  },
+  {
+    id: 2,
+    title: "Datos del proveedor",
+    duration: 1200,
+    validates: "supplier fields",
+  },
+  {
+    id: 3,
+    title: "Datos del importador",
+    duration: 1200,
+    validates: "customer fields",
+  },
+  {
+    id: 4,
+    title: "Información de factura",
+    duration: 1000,
+    validates: "invoice fields",
+  },
+  {
+    id: 5,
+    title: "Detalle de items",
+    duration: 1500,
+    validates: "items validation",
+  },
+  {
+    id: 6,
+    title: "Información de transporte",
+    duration: 800,
+    validates: "transport fields",
+  },
+  {
+    id: 7,
+    title: "Validaciones numéricas",
+    duration: 1000,
+    validates: "numeric validations",
+  },
 ];
 
 export default function ProcessingPage() {
@@ -23,28 +58,27 @@ export default function ProcessingPage() {
   const [currentStep, setCurrentStep] = useState(0);
   const [progress, setProgress] = useState(0);
 
-  const validationId = searchParams.get("id");
-  const filename = searchParams.get("filename") || "factura.json";
-
+  const validationId = searchParams.get("id"); 
+  
   useEffect(() => {
-    // Redirect if no validation ID
     if (!validationId) {
       router.push("/validation/home");
       return;
     }
 
     if (currentStep >= validationSteps.length) {
-      // All steps completed
       setProgress(100);
       setTimeout(() => {
-        router.push(`/validation/results?id=${validationId}`);
+        router.push(`/validation/results/${validationId}`);
       }, 1000);
       return;
     }
 
     const timer = setTimeout(() => {
       setCurrentStep((prev) => prev + 1);
-      setProgress(Math.min(100, ((currentStep + 1) / validationSteps.length) * 100));
+      setProgress(
+        Math.min(100, ((currentStep + 1) / validationSteps.length) * 100)
+      );
     }, validationSteps[currentStep].duration);
 
     return () => clearTimeout(timer);
