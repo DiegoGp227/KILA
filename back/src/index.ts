@@ -2,7 +2,7 @@ import express from "express";
 import cors from "cors";
 import { router } from "../routes/index.routes.js";
 
-(BigInt.prototype as any).toJSON = function() {
+(BigInt.prototype as any).toJSON = function () {
   return this.toString();
 };
 
@@ -27,7 +27,11 @@ app.use(
 
 // Routes
 app.use(router);
+
+app.use("/api", router);
+
 app.get("/ping", (_req, res) => res.send("pong"));
+
 app.all("*", (_req, res) => {
   res.status(404).json({
     message: "Escribe bien mono estupido",
