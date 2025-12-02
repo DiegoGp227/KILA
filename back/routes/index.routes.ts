@@ -8,17 +8,17 @@ import multer from "multer";
 export const router = Router();
 const upload = multer();
 //Auth routes
-router.post("/api/signup", signup);
-router.post("/api/login", login);
+router.post("/signup", signup);
+router.post("/login", login);
 
 //Validation routes
 router.post(
-  "/api/validation",
+  "/validation",
   authMiddleware,
   upload.single("file"),
   validationJson
 );
 
 // Test routes
-router.get("/api/db", dbCheck);
-router.get("/api/back", (_req, res) => res.send("Test route is working"));
+router.get("/db", dbCheck);
+router.get("/back", (_req, res) => res.send("Test route is working"));
