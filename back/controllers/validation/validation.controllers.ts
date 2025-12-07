@@ -42,3 +42,41 @@ export const validationJson = async (
     res.status(internalError.statusCode).json(internalError.toJSON());
   }
 };
+
+export const resultValidationJsonById = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const userId = req.user?.id;
+    const InvoiceId = req.params.id;
+
+    const result = await ValidationService.resultValidateInvoiceJsonById(userId);
+
+    res.status(200).json({
+      status: "success",
+      message: result.validation.isValid
+        ? "Validación DIAN completada: Factura válida ✓"
+        : "Validación DIAN completada: Se encontraron errores",
+      data: {
+        validation: {
+          isValid: result.validation.isValid,
+          errors: result.validation.errors,
+          warnings: result.validation.warnings,
+          source: result.validation.source,
+        },
+        savedRecord: result.savedRecord,
+      },
+    });
+  } catch (error) {
+    console.error("❌ Error en validación DIAN:", error);
+
+    if (error instanceof AppError) {
+      res.status(error.statusCode).json(error.toJSON());
+      return;
+    }
+
+    const internalError = new InternalServerError("Internal server error");
+    res.status(internalError.statusCode).json(internalError.toJSON());
+  }
+};

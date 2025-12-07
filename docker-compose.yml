@@ -1,25 +1,4 @@
 services:
-  postgres:
-    image: postgres:16-alpine
-    container_name: kila_postgres
-    restart: unless-stopped
-    environment:
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB}
-    # ❌ ELIMINAR esto si solo el backend accede a la DB
-    # ports:
-    #   - "5433:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    networks:
-      - kila_network
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
   backend:
     build: 
       context: ./back
@@ -38,7 +17,7 @@ services:
       TOKEN_EXPIRATION: ${TOKEN_EXPIRATION}
       API_KEY: ${API_KEY}
     ports:
-      - "4003:${PORT}"
+      - "4004:${PORT}"
     networks:
       - kila_network
     command: sh -c "npx prisma migrate deploy && npx prisma generate && npm start"
@@ -54,7 +33,7 @@ services:
     environment:
       NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}
     ports:
-      - "5003:3000"
+      - "5004:3000"
     networks:
       - kila_network
 

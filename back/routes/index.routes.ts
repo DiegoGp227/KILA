@@ -2,7 +2,7 @@ import { Router } from "express";
 import dbCheck from "../controllers/test/test.js";
 import { login, signup } from "../controllers/auth/auth.controllers.js";
 import { authMiddleware } from "../middleware/auth.js";
-import { validationJson } from "../controllers/validation/validation.controllers.js";
+import { resultValidationJsonById, validationJson } from "../controllers/validation/validation.controllers.js";
 import multer from "multer";
 
 export const router = Router();
@@ -18,6 +18,8 @@ router.post(
   upload.single("file"),
   validationJson
 );
+
+router.get("validation/:id", authMiddleware, resultValidationJsonById);
 
 // Test routes
 router.get("/db", dbCheck);
