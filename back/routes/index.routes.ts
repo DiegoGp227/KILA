@@ -1,11 +1,11 @@
-import { Router } from "express";
+import { Router, type Router as RouterType } from "express";
 import dbCheck from "../controllers/test/test.js";
 import { login, signup } from "../controllers/auth/auth.controllers.js";
 import { authMiddleware } from "../middleware/auth.js";
 import { validationJson } from "../controllers/validation/validation.controllers.js";
 import multer from "multer";
 
-export const router = Router();
+export const router: RouterType = Router();
 const upload = multer();
 //Auth routes
 router.post("/api/signup", signup);
