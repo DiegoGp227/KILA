@@ -1,25 +1,29 @@
 # Stage 1: Builder
 FROM node:20-alpine AS builder
 
+RUN corepack enable && corepack prepare pnpm@latest --activate
+
 WORKDIR /app
 
 # Copy package files
-COPY package*.json ./
+COPY package.json pnpm-lock.yaml ./
 
 # Install all dependencies (including devDependencies for building)
-RUN npm install
+RUN pnpm install --frozen-lockfile
 
 # Copy source code
 COPY . .
 
 # Generate Prisma Client
-RUN npx prisma generate
+RUN pnpm prisma generate
 
 # Build TypeScript
-RUN npm run build
+RUN pnpm build
 
 # Stage 2: Production
 FROM node:20-alpine AS production
+
+RUN corepack enable && corepack prepare pnpm@latest --activate
 
 WORKDIR /app
 
@@ -31,17 +35,17 @@ RUN addgroup -g 1001 -S nodejs && \
     adduser -S nodejs -u 1001
 
 # Copy package files
-COPY package*.json ./
+COPY package.json pnpm-lock.yaml ./
 
 # Install only production dependencies
-RUN npm install --only=production && \
-    npm cache clean --force
+RUN pnpm install --frozen-lockfile --prod
 
 # Copy built application from builder
 COPY --from=builder /app/dist ./dist
 
 # Copy Prisma schema and generated client
 COPY --from=builder /app/prisma ./prisma
+COPY --from=builder /app/node_modules/.pnpm/@prisma+client* ./node_modules/.pnpm/
 COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
 COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
 
@@ -52,7 +56,7 @@ RUN chown -R nodejs:nodejs /app
 USER nodejs
 
 # Expose port
-EXPOSE 4000
+EXPOSE 4001
 
 # Use dumb-init to handle signals properly
 ENTRYPOINT ["dumb-init", "--"]
