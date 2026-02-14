@@ -39,7 +39,7 @@ services:
       - "${BACKEND_PORT}:4001"
     networks:
       - kila_network
-    command: sh -c "pnpm prisma migrate deploy && node dist/src/index.js"
+    command: sh -c "npx prisma migrate deploy && node dist/src/index.js"
 
   frontend:
     build:
